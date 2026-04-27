@@ -1,0 +1,1074 @@
+openapi: 3.0.3
+info:
+  title: Skillbytes Learning API
+  version: 1.0.0
+  description: |
+    Dokumentasi API backend e-learning Skillbytes (Level dan Lesson).
+
+    Semua endpoint pada dokumentasi ini membutuhkan authentication token (Bearer token/Sanctum).
+    Header yang harus dikirim:
+    Authorization: Bearer {token}
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local API
+
+security:
+  - sanctum: []
+
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Users
+    description: User CRUD endpoints
+  - name: Levels
+    description: Level and nested lesson endpoints
+  - name: Lessons
+    description: Lesson detail and completion endpoints
+  - name: Progress
+    description: User learning progress endpoints
+
+paths:
+  /auth/user/login:
+    post:
+      tags:
+        - Users
+      summary: Login user (legacy user auth endpoint)
+      operationId: loginUserLegacy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+
+  /auth/user:
+    get:
+      tags:
+        - Users
+      summary: Get users (paginated)
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: pagesize
+          schema:
+            type: integer
+            default: 15
+        - in: query
+          name: pagenumber
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: q
+          schema:
+            type: string
+            nullable: true
+        - in: query
+          name: sortby
+          schema:
+            type: string
+            default: created_at
+        - in: query
+          name: sorttype
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsersResponse'
+    post:
+      tags:
+        - Users
+      summary: Create user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreUserRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleUserResponse'
+
+  /auth/user/all:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersResponse'
+
+  /auth/user/{user}:
+    get:
+      tags:
+        - Users
+      summary: Get user by id
+      operationId: getUserById
+      parameters:
+        - in: path
+          name: user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleUserResponse'
+    put:
+      tags:
+        - Users
+      summary: Update user
+      operationId: updateUser
+      parameters:
+        - in: path
+          name: user
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleUserResponse'
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccessResponse'
+
+  /auth/user/update-password/{user}:
+    put:
+      tags:
+        - Users
+      summary: Update user password
+      operationId: updateUserPassword
+      parameters:
+        - in: path
+          name: user
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - old_password
+                - password
+                - password_confirmation
+              properties:
+                old_password:
+                  type: string
+                  format: password
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                password_confirmation:
+                  type: string
+                  format: password
+                  minLength: 8
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccessResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Register success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '401':
+          description: Unauthorized (token missing/invalid)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout user
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Logout success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /levels:
+    get:
+      tags:
+        - Levels
+      summary: Get levels (paginated)
+      operationId: getLevels
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLevelsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Levels
+      summary: Create level
+      operationId: createLevel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreLevelRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleLevelResponse'
+
+  /levels/all:
+    get:
+      tags:
+        - Levels
+      summary: Get all levels
+      operationId: getAllLevels
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelsResponse'
+
+  /levels/{level}/lessons:
+    get:
+      tags:
+        - Levels
+      summary: Get lessons by level number
+      operationId: getLessonsByLevel
+      parameters:
+        - in: path
+          name: level
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: level_number
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lesson'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /levels/{level}:
+    get:
+      tags:
+        - Levels
+      summary: Get single level by level_number
+      operationId: getLevelByNumber
+      parameters:
+        - in: path
+          name: level
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleLevelResponse'
+    put:
+      tags:
+        - Levels
+      summary: Update level
+      operationId: updateLevel
+      parameters:
+        - in: path
+          name: level
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreLevelRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleLevelResponse'
+    delete:
+      tags:
+        - Levels
+      summary: Delete level
+      operationId: deleteLevel
+      parameters:
+        - in: path
+          name: level
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccessResponse'
+
+  /lessons:
+    get:
+      tags:
+        - Lessons
+      summary: Get lessons (paginated)
+      operationId: getLessons
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLessonsResponse'
+    post:
+      tags:
+        - Lessons
+      summary: Create lesson
+      operationId: createLesson
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoreLessonRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleLessonResponse'
+
+  /lessons/all:
+    get:
+      tags:
+        - Lessons
+      summary: Get all lessons
+      operationId: getAllLessons
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonsResponse'
+        '404':
+          description: Level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /lessons/{slug}:
+    get:
+      tags:
+        - Lessons
+      summary: Get lesson detail by slug
+      operationId: getLessonBySlug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+          description: Lesson slug
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lesson'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Lessons
+      summary: Update lesson by slug
+      operationId: updateLesson
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLessonRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleLessonResponse'
+    delete:
+      tags:
+        - Lessons
+      summary: Delete lesson by slug
+      operationId: deleteLesson
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccessResponse'
+
+  /lessons/{lesson}/complete:
+    post:
+      tags:
+        - Lessons
+      summary: Mark lesson as completed
+      operationId: completeLesson
+      parameters:
+        - in: path
+          name: lesson
+          required: true
+          schema:
+            type: integer
+          description: Lesson numeric ID
+      responses:
+        '200':
+          description: Completion saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteLessonResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/progress:
+    get:
+      tags:
+        - Progress
+      summary: Get all user progress
+      operationId: getUserProgress
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProgressResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+      description: Laravel Sanctum token
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - username
+        - password
+        - password_confirmation
+      properties:
+        name:
+          type: string
+          example: Budi Santoso
+        email:
+          type: string
+          format: email
+          example: budi@example.com
+        username:
+          type: string
+          example: budi_santoso
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+        password_confirmation:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: budi@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+
+    StoreLevelRequest:
+      type: object
+      required:
+        - level_number
+      properties:
+        level_number:
+          type: integer
+          minimum: 1
+          example: 1
+
+    StoreLessonRequest:
+      type: object
+      required:
+        - level_id
+        - title
+        - description
+      properties:
+        level_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Pengenalan PBO
+        description:
+          type: string
+          example: Dasar konsep object-oriented programming
+        duration:
+          type: string
+          nullable: true
+          example: 25 menit
+        pdf_file:
+          type: string
+          format: binary
+          nullable: true
+          description: File materi PDF (maksimal 10MB)
+
+    UpdateLessonRequest:
+      type: object
+      properties:
+        level_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: PBO Dasar
+        description:
+          type: string
+          example: Update materi PBO
+        duration:
+          type: string
+          nullable: true
+          example: 30 menit
+        pdf_url:
+          type: string
+          nullable: true
+          example: lessons/pdfs/pbo-dasar.pdf
+
+    StoreUserRequest:
+      type: object
+      required:
+        - name
+        - email
+        - username
+        - password
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        username:
+          type: string
+          example: john_doe
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+        role:
+          type: string
+          enum: [admin, guru, siswa]
+          example: siswa
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe Updated
+        email:
+          type: string
+          format: email
+          example: john.updated@example.com
+        username:
+          type: string
+          example: john_updated
+        role:
+          type: string
+          enum: [admin, guru, siswa]
+          example: siswa
+        is_active:
+          type: boolean
+          example: true
+
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 5
+        name:
+          type: string
+          example: Budi Santoso
+        email:
+          type: string
+          format: email
+          example: budi@example.com
+        username:
+          type: string
+          example: budi_santoso
+        role:
+          type: string
+          example: siswa
+        role_label:
+          type: string
+          example: Siswa
+        is_active:
+          type: boolean
+          example: true
+        email_verified_at:
+          type: string
+          nullable: true
+          format: date-time
+          example: null
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-04-21T10:30:00.000000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-04-21T10:30:00.000000Z'
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Lesson slug generated by the system
+          example: k9w3x8n2q1ab
+        title:
+          type: string
+          example: Pengenalan PBO
+        description:
+          type: string
+          example: Dasar konsep object-oriented programming
+        duration:
+          type: string
+          nullable: true
+          example: 25 menit
+        pdf_url:
+          type: string
+          nullable: true
+          example: lessons/pdfs/pbo.pdf
+        completed:
+          type: boolean
+          example: false
+
+    Level:
+      type: object
+      properties:
+        levelNumber:
+          type: integer
+          example: 1
+        lessons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+
+    AuthSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Login successful
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/UserSummary'
+            token:
+              type: string
+              example: 1|Vfg2oY6pN8TokenExample
+
+    GenericSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Logout successful
+        data:
+          nullable: true
+          example: null
+
+    CompleteLessonResponse:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+          example: 12
+        completed:
+          type: boolean
+          example: true
+        completedAt:
+          type: string
+          nullable: true
+          format: date-time
+          example: '2026-04-21T12:10:00.000000Z'
+
+    UserProgressResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 5
+        totalLessons:
+          type: integer
+          example: 40
+        completedLessons:
+          type: integer
+          example: 12
+        progressPercentage:
+          type: number
+          format: float
+          example: 30
+        levels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Level'
+
+    SingleLevelResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Level retrieved successfully
+        data:
+          $ref: '#/components/schemas/Level'
+
+    LevelsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All levels retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Level'
+
+    PaginatedLevelsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Levels retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Level'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    SingleLessonResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Lesson retrieved successfully
+        data:
+          $ref: '#/components/schemas/Lesson'
+
+    SingleUserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: User retrieved successfully
+        data:
+          $ref: '#/components/schemas/UserSummary'
+
+    UsersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All users retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSummary'
+
+    PaginatedUsersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Users retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSummary'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    LessonsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All lessons retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+
+    PaginatedLessonsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Lessons retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        per_page:
+          type: integer
+          example: 15
+        current_page:
+          type: integer
+          example: 1
+        last_page:
+          type: integer
+          example: 7
+        from:
+          type: integer
+          nullable: true
+          example: 1
+        to:
+          type: integer
+          nullable: true
+          example: 15
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Unauthorized
+        errors:
+          nullable: true
+          oneOf:
+            - type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            - type: 'null'
