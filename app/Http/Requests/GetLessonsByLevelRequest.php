@@ -18,7 +18,7 @@ class GetLessonsByLevelRequest extends FormRequest
         ];
     }
 
-    protected function validationData(): array
+    public function validationData(): array
     {
         return array_merge($this->all(), [
             'level' => $this->route('level'),

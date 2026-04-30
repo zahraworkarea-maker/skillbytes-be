@@ -29,12 +29,12 @@ Route::prefix('auth/user')->group(function () {
             // Create user
             Route::post('/', [UserController::class, 'store'])->name('auth.user.store');
 
-            // Update user
-            Route::put('/{user}', [UserController::class, 'update'])->name('auth.user.update');
-
             // Delete user
             Route::delete('/{user}', [UserController::class, 'destroy'])->name('auth.user.destroy');
         });
+
+        // Update user - accessible by all authenticated users
+        Route::match(['put', 'patch', 'post'], '/{user}', [UserController::class, 'update'])->name('auth.user.update');
 
         // Update password
         Route::put('/update-password/{user}', [UserController::class, 'updatePassword'])->name('auth.user.updatePassword');

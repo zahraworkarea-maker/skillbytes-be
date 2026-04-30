@@ -101,7 +101,10 @@ class UserController extends Controller
             }
 
             $dto = CreateUserDto::fromArray($request->validated());
-            $user = $this->userService->createUser($dto);
+
+            // Handle profile photo upload
+            $profilePhoto = $request->file('profile_photo');
+            $user = $this->userService->createUser($dto, $profilePhoto);
             return $this->createdResponse(
                 new UserResource($user),
                 'User created successfully'
@@ -113,24 +116,60 @@ class UserController extends Controller
 
     /**
      * Update user
-     * PUT /api/users/{id}
-     * Authorization: Admin and Guru only
+     * POST /api/auth/user/{user} - Use POST for form-data/file upload (RECOMMENDED)
+     * PUT /api/auth/user/{user} - Use PUT for JSON body only
+     * PATCH /api/auth/user/{user} - Use PATCH for JSON body only
+     *
+     * Note: PUT/PATCH with multipart/form-data won't parse form data due to PHP limitation.
+     * Always use POST when sending form-data or files.
+     *
+     * Authorization: All authenticated users can update any user
      */
-    public function update(UpdateUserRequest $request, $id): JsonResponse
+    public function update(UpdateUserRequest $request, $user): JsonResponse
     {
         try {
-            // Authorization check: Only admin and guru can update users
-            if (!in_array(auth()->user()->role, [UserRole::ADMIN, UserRole::GURU])) {
-                return $this->errorResponse('Forbidden: Only admin and guru can update users', 403);
+            $userId = is_object($user) ? $user->id : $user;
+            $validated = $request->validated();
+
+            \Log::info('[UserController] Update request - DETAILED', [
+                'user_id' => $userId,
+                'validated_data' => $validated,
+                'all_input' => $request->all(),
+                'all_files' => $request->allFiles(),
+                'has_profile_photo' => $request->hasFile('profile_photo'),
+                'request_method' => $request->method(),
+                'content_type' => $request->header('Content-Type'),
+                'validated_keys' => array_keys($validated),
+            ]);
+
+            $dto = UpdateUserDto::fromArray($validated);
+
+            // If validated is empty but we have input, use all() to get form data
+            if (empty($validated) && !empty($request->all())) {
+                \Log::warning('[UserController] Validated empty but has input, using all()', [
+                    'all' => $request->all(),
+                ]);
+                $dto = UpdateUserDto::fromArray($request->all());
             }
 
-            $dto = UpdateUserDto::fromArray($request->validated());
-            $user = $this->userService->updateUser($id, $dto);
+            // Handle profile photo upload
+            $profilePhoto = $request->file('profile_photo');
+            if ($profilePhoto) {
+                \Log::info('[UserController] Photo file detected', [
+                    'filename' => $profilePhoto->getClientOriginalName(),
+                    'size' => $profilePhoto->getSize(),
+                ]);
+            }
+
+            $this->userService->updateUser($userId, $dto, $profilePhoto);
+            $updatedUser = $this->userService->getUserById($userId);
+
             return $this->successResponse(
-                new UserResource($user),
+                new UserResource($updatedUser),
                 'User updated successfully'
             );
         } catch (\Exception $e) {
+            \Log::error('[UserController] Update failed: ' . $e->getMessage());
             return $this->notFoundResponse('User not found');
         }
     }

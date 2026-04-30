@@ -80,8 +80,22 @@ abstract class BaseRepository
      */
     public function update($id, array $data)
     {
+        \Log::info('[BaseRepository] update() called', [
+            'model' => class_basename($this->model),
+            'id' => $id,
+            'data_to_update' => $data,
+        ]);
+
         $record = $this->findOrFail($id);
         $record->update($data);
+        $record->refresh();
+
+        \Log::info('[BaseRepository] update() complete', [
+            'id' => $id,
+            'updated_fields' => array_keys($data),
+            'updated_record' => $record->toArray(),
+        ]);
+
         return $record;
     }
 

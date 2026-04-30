@@ -25,6 +25,7 @@ class StoreUserRequest extends FormRequest
             'username' => ['required', 'string', 'unique:users,username', 'max:50'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['nullable', Rule::enum(UserRole::class)],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
     }
 
@@ -40,6 +41,9 @@ class StoreUserRequest extends FormRequest
             'username.max' => 'Username maksimal 50 karakter',
             'password.required' => 'Password tidak boleh kosong',
             'password.min' => 'Password minimal 8 karakter',
+            'profile_photo.image' => 'File harus berupa gambar',
+            'profile_photo.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
+            'profile_photo.max' => 'Ukuran gambar maksimal 2MB',
         ];
     }
 }

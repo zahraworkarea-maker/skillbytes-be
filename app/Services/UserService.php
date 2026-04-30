@@ -6,6 +6,8 @@ use App\DTOs\CreateUserDto;
 use App\DTOs\UpdateUserDto;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class UserService extends BaseService
 {
@@ -51,15 +53,32 @@ class UserService extends BaseService
     /**
      * Create new user
      */
-    public function createUser(CreateUserDto $dto)
+    public function createUser(CreateUserDto $dto, ?UploadedFile $profilePhoto = null)
     {
         try {
             $data = $dto->toArray();
             // Remove null values
             $data = array_filter($data, fn($value) => $value !== null);
             $data['password'] = Hash::make($data['password']);
-            return $this->userRepository->create($data);
+
+            // Create user first
+            $user = $this->userRepository->create($data);
+
+            // Handle profile photo upload
+            if ($profilePhoto) {
+                \Log::info('[UserService] Profile photo received during user creation', [
+                    'filename' => $profilePhoto->getClientOriginalName(),
+                    'size' => $profilePhoto->getSize(),
+                    'mime' => $profilePhoto->getMimeType(),
+                ]);
+                $photoPath = $this->storeProfilePhoto($profilePhoto, $user->id);
+                $user = $this->userRepository->update($user->id, ['profile_photo_path' => $photoPath]);
+                \Log::info('[UserService] Photo saved with path: ' . $photoPath);
+            }
+
+            return $user;
         } catch (\Exception $e) {
+            \Log::error('[UserService] Create user error: ' . $e->getMessage());
             return $this->handleError($e);
         }
     }
@@ -67,20 +86,107 @@ class UserService extends BaseService
     /**
      * Update user
      */
-    public function updateUser($id, UpdateUserDto $dto)
+    public function updateUser($id, UpdateUserDto $dto, ?UploadedFile $profilePhoto = null)
     {
         try {
             $data = $dto->toArray();
+            \Log::info('[UserService] updateUser START', [
+                'user_id' => $id,
+                'dto_array' => $data,
+            ]);
+
             // Remove null values
             $data = array_filter($data, fn($value) => $value !== null);
+            \Log::info('[UserService] After filter', [
+                'filtered_data' => $data,
+            ]);
 
             if (isset($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
             }
 
+            // Handle profile photo upload
+            if ($profilePhoto) {
+                \Log::info('[UserService] Profile photo received', [
+                    'filename' => $profilePhoto->getClientOriginalName(),
+                    'size' => $profilePhoto->getSize(),
+                    'mime' => $profilePhoto->getMimeType(),
+                ]);
+                $photoPath = $this->storeProfilePhoto($profilePhoto, $id);
+                $data['profile_photo_path'] = $photoPath;
+                \Log::info('[UserService] Photo saved with path: ' . $photoPath);
+            } else {
+                \Log::info('[UserService] No profile photo provided');
+            }
+
             return $this->userRepository->update($id, $data);
         } catch (\Exception $e) {
+            \Log::error('[UserService] Update user error: ' . $e->getMessage());
             return $this->handleError($e);
+        }
+    }
+
+    /**
+     * Store profile photo and return the path
+     */
+    public function storeProfilePhoto(UploadedFile $file, $userId): string
+    {
+        try {
+            \Log::info('[UserService] storeProfilePhoto START', [
+                'userId' => $userId,
+                'filename' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+            ]);
+
+            // Delete old photo if exists
+            $user = $this->userRepository->find($userId);
+            if ($user && $user->profile_photo_path) {
+                \Log::info('[UserService] Deleting old photo', [
+                    'old_path' => $user->profile_photo_path,
+                ]);
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+
+            // Store new photo
+            $path = $file->store('profile-photos', 'public');
+            \Log::info('[UserService] Photo stored successfully', [
+                'stored_path' => $path,
+                'storage_disk' => 'public',
+            ]);
+
+            // Verify file exists
+            if (Storage::disk('public')->exists($path)) {
+                \Log::info('[UserService] File verified in storage');
+            } else {
+                \Log::warning('[UserService] File not found after storage!');
+            }
+
+            return $path;
+        } catch (\Exception $e) {
+            \Log::error('[UserService] Photo upload failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw new \Exception('Failed to upload profile photo: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete profile photo
+     */
+    public function deleteProfilePhoto($userId): bool
+    {
+        try {
+            $user = $this->userRepository->find($userId);
+            if ($user && $user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+                $this->userRepository->update($userId, ['profile_photo_path' => null]);
+                return true;
+            }
+            return false;
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to delete profile photo: ' . $e->getMessage());
         }
     }
 

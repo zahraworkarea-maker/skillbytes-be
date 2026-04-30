@@ -10,6 +10,7 @@ class UpdateUserDto extends BaseDto
         public ?string $username = null,
         public ?string $password = null,
         public ?string $role = null,
+        public ?string $profile_photo_path = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -20,6 +21,7 @@ class UpdateUserDto extends BaseDto
             username: $data['username'] ?? null,
             password: $data['password'] ?? null,
             role: $data['role'] ?? null,
+            profile_photo_path: $data['profile_photo_path'] ?? null,
         );
     }
 
@@ -28,7 +30,10 @@ class UpdateUserDto extends BaseDto
         return array_filter([
             'name' => $this->name,
             'email' => $this->email,
+            'username' => $this->username,
             'password' => $this->password,
+            'role' => $this->role,
+            'profile_photo_path' => $this->profile_photo_path,
         ], fn($value) => $value !== null);
     }
 }

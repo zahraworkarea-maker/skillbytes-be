@@ -145,55 +145,7 @@ paths:
       tags:
         - Users
       summary: Update user (accessible by all authenticated users)
-      operationId: updateUserPut
-      parameters:
-        - in: path
-          name: user
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UpdateUserRequest'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SingleUserResponse'
-    patch:
-      tags:
-        - Users
-      summary: Update user (accessible by all authenticated users)
-      operationId: updateUserPatch
-      parameters:
-        - in: path
-          name: user
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UpdateUserRequest'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SingleUserResponse'
-    post:
-      tags:
-        - Users
-      summary: Update user (accessible by all authenticated users)
-      operationId: updateUserPost
+      operationId: updateUser
       parameters:
         - in: path
           name: user
@@ -792,7 +744,7 @@ components:
           type: string
           format: binary
           nullable: true
-          description: "Profile photo image file (max 2MB, formats: jpeg, png, jpg, gif)"
+          description: Profile photo image file (max 2MB, formats: jpeg, png, jpg, gif)
 
     UpdateUserRequest:
       type: object
@@ -820,7 +772,7 @@ components:
           type: string
           format: binary
           nullable: true
-          description: "Profile photo image file (max 2MB, formats: jpeg, png, jpg, gif)"
+          description: Profile photo image file (max 2MB, formats: jpeg, png, jpg, gif)
 
     UserSummary:
       type: object
