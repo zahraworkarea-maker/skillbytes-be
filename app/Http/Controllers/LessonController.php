@@ -80,6 +80,14 @@ class LessonController extends Controller
         );
     }
 
+    /**
+     * Update lesson
+     * POST /api/lessons/{slug} - Use POST for form-data/file upload (RECOMMENDED)
+     * PUT /api/lessons/{slug} - Use PUT for JSON body only
+     *
+     * Note: PUT/PATCH with multipart/form-data won't parse form data due to PHP limitation.
+     * Always use POST when sending form-data or files.
+     */
     public function update(UpdateLessonRequest $request, string $slug): JsonResponse
     {
         $lesson = $this->lessonService->updateLessonBySlug($slug, $request->validated(), $request->user());

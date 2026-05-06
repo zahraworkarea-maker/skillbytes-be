@@ -22,7 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/levels/{level}', [LevelController::class, 'destroy']);
 
     Route::post('/lessons', [LessonController::class, 'store']);
-    Route::put('/lessons/{slug}', [LessonController::class, 'update']);
+    Route::post('/lessons/{slug}', [LessonController::class, 'update']); // Use POST for form-data/file upload
+    Route::put('/lessons/{slug}', [LessonController::class, 'update']); // Use PUT for JSON body only
     Route::delete('/lessons/{slug}', [LessonController::class, 'destroy']);
     });
 
