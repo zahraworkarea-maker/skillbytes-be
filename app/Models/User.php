@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -63,5 +64,15 @@ class User extends Authenticatable
             ->wherePivot('completed', true)
             ->withPivot(['completed', 'completed_at'])
             ->withTimestamps();
+    }
+
+    public function caseProgress(): HasMany
+    {
+        return $this->hasMany(UserCaseProgress::class);
+    }
+
+    public function submissions(): HasMany
+    {
+        return $this->hasMany(CaseSubmission::class);
     }
 }

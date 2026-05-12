@@ -23,21 +23,29 @@ Route::prefix('auth/user')->group(function () {
         Route::get('/all', [UserController::class, 'getAllUsers'])->name('auth.user.all');
 
         // Get single user by ID
-        Route::get('/{user}', [UserController::class, 'show'])->name('auth.user.show');
+        Route::get('/{user}', [UserController::class, 'show'])
+            ->whereNumber('user')
+            ->name('auth.user.show');
 
         Route::middleware('role:admin,guru')->group(function () {
             // Create user
             Route::post('/', [UserController::class, 'store'])->name('auth.user.store');
 
             // Delete user
-            Route::delete('/{user}', [UserController::class, 'destroy'])->name('auth.user.destroy');
+            Route::delete('/{user}', [UserController::class, 'destroy'])
+                ->whereNumber('user')
+                ->name('auth.user.destroy');
         });
 
         // Update user - accessible by all authenticated users
-        Route::match(['put', 'patch', 'post'], '/{user}', [UserController::class, 'update'])->name('auth.user.update');
+        Route::match(['put', 'patch', 'post'], '/{user}', [UserController::class, 'update'])
+            ->whereNumber('user')
+            ->name('auth.user.update');
 
         // Update password
-        Route::put('/update-password/{user}', [UserController::class, 'updatePassword'])->name('auth.user.updatePassword');
+        Route::put('/update-password/{user}', [UserController::class, 'updatePassword'])
+            ->whereNumber('user')
+            ->name('auth.user.updatePassword');
     });
 });
 

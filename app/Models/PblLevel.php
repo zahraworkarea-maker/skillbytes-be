@@ -6,23 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Level extends Model
+class PblLevel extends Model
 {
     use HasFactory;
 
-    protected $table = 'levels';
+    protected $table = 'pbl_levels';
 
     protected $fillable = [
-        'level_number',
         'name',
     ];
 
-    protected $casts = [
-        'level_number' => 'integer',
-    ];
-
-    public function lessons(): HasMany
+    /**
+     * Get all PBL cases for this level
+     */
+    public function pblCases(): HasMany
     {
-        return $this->hasMany(Lesson::class)->orderBy('id');
+        return $this->hasMany(PblCase::class, 'level_id');
     }
 }

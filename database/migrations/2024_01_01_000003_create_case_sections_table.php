@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('levels', function (Blueprint $table) {
+        Schema::create('case_sections', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('level_number')->unique();
-            $table->string('name')->nullable(); // Name for materi levels
+            $table->foreignId('case_id')->constrained('pbl_cases')->onDelete('cascade');
+            $table->string('title');
+            $table->integer('order')->default(0);
             $table->timestamps();
-
-            $table->index('level_number');
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('levels');
+        Schema::dropIfExists('case_sections');
     }
 };

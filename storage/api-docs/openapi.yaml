@@ -27,6 +27,18 @@ tags:
     description: Lesson detail and completion endpoints
   - name: Progress
     description: User learning progress endpoints
+  - name: PBL Levels
+    description: Manage PBL levels (GET for all users, CRUD for Admin only)
+  - name: PBL Cases
+    description: PBL case management (GET for all users, CRUD for Admin/Guru only)
+  - name: PBL Sections
+    description: PBL case sections (Admin/Guru only)
+  - name: PBL Section Items
+    description: PBL section items (Admin/Guru only)
+  - name: PBL Submissions
+    description: PBL case submissions (file upload)
+  - name: Media
+    description: Media management (Admin/Guru only)
 
 paths:
   /auth/user/login:
@@ -650,6 +662,856 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /pbl-levels:
+    get:
+      tags:
+        - PBL Levels
+      summary: List all PBL levels
+      operationId: listPblLevels
+      description: Retrieve all PBL levels. Accessible to all authenticated users.
+      responses:
+        '200':
+          description: List of PBL levels retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblLevelsListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - PBL Levels
+      summary: Create a new PBL level (Admin only)
+      operationId: createPblLevel
+      description: Create a new PBL level. Only accessible to Admin role.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePblLevelRequest'
+      responses:
+        '201':
+          description: PBL level created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblLevelResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin can create levels
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /pbl-levels/{id}:
+    get:
+      tags:
+        - PBL Levels
+      summary: Get a specific PBL level
+      operationId: getPblLevel
+      description: Retrieve details of a specific PBL level by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: PBL level ID
+      responses:
+        '200':
+          description: PBL level retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblLevelResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: PBL level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - PBL Levels
+      summary: Update a PBL level (Admin only)
+      operationId: updatePblLevel
+      description: Update an existing PBL level. Only accessible to Admin role.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: PBL level ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePblLevelRequest'
+      responses:
+        '200':
+          description: PBL level updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblLevelResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin can update levels
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: PBL level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - PBL Levels
+      summary: Delete a PBL level (Admin only)
+      operationId: deletePblLevel
+      description: Delete an existing PBL level. Only accessible to Admin role.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: PBL level ID
+      responses:
+        '200':
+          description: PBL level deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin can delete levels
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: PBL level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pbl-cases:
+    get:
+      tags:
+        - PBL Cases
+      summary: List all PBL cases
+      operationId: listPblCases
+      description: Retrieve all available PBL cases with current user's status
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - in: query
+          name: level_id
+          schema:
+            type: integer
+          description: Filter by level ID
+      responses:
+        '200':
+          description: List of PBL cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblCasesListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - PBL Cases
+      summary: Create a new PBL case (Admin/Guru only)
+      operationId: createPblCase
+      description: Create a new PBL case with all details. Only accessible to Admin and Guru roles.
+      requestBody:
+        required: true
+        description: PBL case data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePblCaseRequest'
+      responses:
+        '201':
+          description: PBL case created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblCaseCreateResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can create cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /pbl-cases/{id}:
+    get:
+      tags:
+        - PBL Cases
+      summary: Get PBL case details
+      operationId: getPblCase
+      description: Retrieve full details of a specific PBL case including all sections and items
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Case ID
+      responses:
+        '200':
+          description: Detailed PBL case information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblCaseDetail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Case not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - PBL Cases
+      summary: Update a PBL case (Admin/Guru only)
+      operationId: updatePblCase
+      description: Update an existing PBL case. Only accessible to Admin and Guru roles.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: PBL case ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePblCaseRequest'
+      responses:
+        '200':
+          description: PBL case updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PblCaseUpdateResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can update cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: PBL case not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - PBL Cases
+      summary: Delete a PBL case (Admin/Guru only)
+      operationId: deletePblCase
+      description: Delete an existing PBL case. Only accessible to Admin and Guru roles.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: PBL case ID
+      responses:
+        '200':
+          description: PBL case deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can delete cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: PBL case not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pbl-cases/{caseId}/sections:
+    get:
+      tags:
+        - PBL Sections
+      summary: Get sections of a case
+      operationId: getCaseSections
+      description: Retrieve all sections for a specific case
+      parameters:
+        - in: path
+          name: caseId
+          required: true
+          schema:
+            type: integer
+          description: Case ID
+      responses:
+        '200':
+          description: List of sections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseSectionsListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can view sections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Case not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - PBL Sections
+      summary: Create a new section (Admin/Guru only)
+      operationId: createCaseSection
+      description: Create a new section for a case
+      parameters:
+        - in: path
+          name: caseId
+          required: true
+          schema:
+            type: integer
+          description: Case ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaseSectionRequest'
+      responses:
+        '201':
+          description: Section created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseSectionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can create sections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Case not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /pbl-sections/{id}:
+    put:
+      tags:
+        - PBL Sections
+      summary: Update a section (Admin/Guru only)
+      operationId: updateCaseSection
+      description: Update an existing section
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Section ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCaseSectionRequest'
+      responses:
+        '200':
+          description: Section updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseSectionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can update sections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Section not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - PBL Sections
+      summary: Delete a section (Admin/Guru only)
+      operationId: deleteCaseSection
+      description: Delete an existing section
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Section ID
+      responses:
+        '200':
+          description: Section deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can delete sections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Section not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pbl-sections/{sectionId}/items:
+    post:
+      tags:
+        - PBL Section Items
+      summary: Create a section item (Admin/Guru only)
+      operationId: createSectionItem
+      description: Create a new item in a section
+      parameters:
+        - in: path
+          name: sectionId
+          required: true
+          schema:
+            type: integer
+          description: Section ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSectionItemRequest'
+      responses:
+        '201':
+          description: Item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SectionItemResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can create items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Section not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /pbl-items/{id}:
+    put:
+      tags:
+        - PBL Section Items
+      summary: Update a section item (Admin/Guru only)
+      operationId: updateSectionItem
+      description: Update an existing section item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Item ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSectionItemRequest'
+      responses:
+        '200':
+          description: Item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SectionItemResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can update items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - PBL Section Items
+      summary: Delete a section item (Admin/Guru only)
+      operationId: deleteSectionItem
+      description: Delete an existing section item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Item ID
+      responses:
+        '200':
+          description: Item deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can delete items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pbl-submissions:
+    post:
+      tags:
+        - PBL Submissions
+      summary: Submit answer for a PBL case (File upload)
+      operationId: submitCaseAnswer
+      description: Submit an answer to a PBL case as a file upload. Can only submit once per case.
+      requestBody:
+        required: true
+        description: Case submission with file
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CaseSubmissionFileRequest'
+      responses:
+        '201':
+          description: Answer submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseSubmissionResponse'
+        '400':
+          description: Already submitted or case not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    get:
+      tags:
+        - PBL Submissions
+      summary: Get user's submissions
+      operationId: getUserSubmissions
+      description: Retrieve all submissions made by the current user
+      responses:
+        '200':
+          description: List of user's submissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSubmissionsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /pbl-submissions/{id}:
+    get:
+      tags:
+        - PBL Submissions
+      summary: Get submission details
+      operationId: getSubmission
+      description: Get details of a specific submission
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Submission ID
+      responses:
+        '200':
+          description: Submission details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseSubmission'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Not authorized to view this submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Submission not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /upload-image:
+    post:
+      tags:
+        - Media
+      summary: Upload an image (Admin/Guru only)
+      operationId: uploadImage
+      description: Upload an image for PBL cases or section items. Only accessible to Admin and Guru roles.
+      requestBody:
+        required: true
+        description: Image file
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageUploadRequest'
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Only Admin and Guru can upload images
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     sanctum:
@@ -1119,6 +1981,459 @@ components:
           type: integer
           nullable: true
           example: 15
+
+    PblCase:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        case_number:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+          nullable: true
+        time_limit:
+          type: integer
+          description: Time limit in minutes
+        start_date:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        level_id:
+          type: integer
+        level:
+          $ref: '#/components/schemas/Level'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PblCaseWithStatus:
+      allOf:
+        - $ref: '#/components/schemas/PblCase'
+        - type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - not-started
+                - in-progress
+                - completed
+                - late
+
+    CaseSection:
+      type: object
+      properties:
+        id:
+          type: integer
+        case_id:
+          type: integer
+        title:
+          type: string
+        order:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseSectionItem'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CaseSectionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        section_id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - heading
+            - text
+            - list
+            - image
+        content:
+          type: string
+          nullable: true
+        image_url:
+          type: string
+          nullable: true
+        order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PblCaseDetail:
+      allOf:
+        - $ref: '#/components/schemas/PblCaseWithStatus'
+        - type: object
+          properties:
+            sections:
+              type: array
+              items:
+                $ref: '#/components/schemas/CaseSection'
+
+    CaseSubmission:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        case_id:
+          type: integer
+        submission_file:
+          type: string
+          description: Path to the submitted file
+          example: /storage/submissions/submission_file_12345.pdf
+        submitted_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        pblCase:
+          $ref: '#/components/schemas/PblCase'
+
+    CaseSubmissionRequest:
+      type: object
+      required:
+        - case_id
+        - answer
+      properties:
+        case_id:
+          type: integer
+          example: 1
+        answer:
+          type: string
+          example: Solusi saya adalah...
+
+    CaseSubmissionFileRequest:
+      type: object
+      required:
+        - case_id
+        - submission_file
+      properties:
+        case_id:
+          type: integer
+          example: 1
+        submission_file:
+          type: string
+          format: binary
+          description: Submission file (PDF, DOC, etc.)
+
+    CreatePblCaseRequest:
+      type: object
+      required:
+        - case_number
+        - title
+        - level_id
+        - description
+        - start_date
+        - deadline
+      properties:
+        case_number:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: System Login Bermasalah
+        level_id:
+          type: integer
+          example: 1
+        description:
+          type: string
+          example: Anda diminta untuk menyelesaikan...
+        image_url:
+          type: string
+          nullable: true
+        time_limit:
+          type: integer
+          description: Time limit in minutes
+          example: 120
+        start_date:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+
+    UpdatePblCaseRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+          nullable: true
+        time_limit:
+          type: integer
+        start_date:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+
+    CreateCaseSectionRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: Problem Description
+        order:
+          type: integer
+          example: 1
+
+    UpdateCaseSectionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        order:
+          type: integer
+
+    CreateSectionItemRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - heading
+            - text
+            - list
+            - image
+        content:
+          type: string
+        image_url:
+          type: string
+          nullable: true
+        order:
+          type: integer
+
+    UpdateSectionItemRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - heading
+            - text
+            - list
+            - image
+        content:
+          type: string
+        image_url:
+          type: string
+          nullable: true
+        order:
+          type: integer
+
+    ImageUploadRequest:
+      type: object
+      required:
+        - image
+      properties:
+        image:
+          type: string
+          format: binary
+          description: Image file to upload
+
+    PblCasesListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PblCaseWithStatus'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    AdminPblCasesListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PblCase'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CaseSubmissionResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Answer submitted successfully
+        data:
+          $ref: '#/components/schemas/CaseSubmission'
+
+    UserSubmissionsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseSubmission'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    PblCaseCreateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: PBL case created successfully
+        data:
+          $ref: '#/components/schemas/PblCaseDetail'
+
+    PblCaseUpdateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: PBL case updated successfully
+        data:
+          $ref: '#/components/schemas/PblCaseDetail'
+
+    CaseSectionsListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseSection'
+
+    CaseSectionResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Section created successfully
+        data:
+          $ref: '#/components/schemas/CaseSection'
+
+    SectionItemResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Section item created successfully
+        data:
+          $ref: '#/components/schemas/CaseSectionItem'
+
+    ImageUploadResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Image uploaded successfully
+        url:
+          type: string
+          example: /storage/pbl/filename.jpg
+        filename:
+          type: string
+
+    SuccessMessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    PblLevel:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Beginner
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreatePblLevelRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Beginner
+
+    UpdatePblLevelRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Advanced
+
+    PblLevelResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: PBL level retrieved successfully
+        data:
+          $ref: '#/components/schemas/PblLevel'
+
+    PblLevelsListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: PBL levels retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PblLevel'
 
     ErrorResponse:
       type: object
