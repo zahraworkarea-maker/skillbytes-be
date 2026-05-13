@@ -1236,26 +1236,29 @@
                 "tags": [
                     "PBL Submissions"
                 ],
-                "summary": "Submit answer for a PBL case (File upload)",
-                "description": "Submit an answer to a PBL case as a file upload. Can only submit once per case.",
+                "summary": "Submit answer for a PBL case",
+                "description": "Submit an answer to a PBL case with optional text and/or file upload. Can only submit once per case. Answer data includes user_id for scoring purposes.",
                 "operationId": "submitCaseAnswer",
                 "requestBody": {
-                    "description": "Case submission with file",
+                    "description": "Case submission with answer text and/or file",
                     "required": true,
                     "content": {
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
-                                    "case_id",
-                                    "submission_file"
+                                    "case_id"
                                 ],
                                 "properties": {
                                     "case_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
+                                    "answer": {
+                                        "description": "Answer text (at least 10 characters, optional)",
+                                        "type": "string"
+                                    },
                                     "submission_file": {
-                                        "description": "Submission file (PDF, DOC, etc.)",
+                                        "description": "Submission file (any format accepted)",
                                         "type": "string",
                                         "format": "binary"
                                     }

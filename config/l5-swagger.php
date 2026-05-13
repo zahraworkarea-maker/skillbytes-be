@@ -48,8 +48,10 @@ return [
                 ],
                 'servers' => [
                     [
-                        'url' => env('L5_SWAGGER_CONST_HOST', 'http://145.79.13.180'),
-                        'description' => 'Production Server',
+                        'url' => env('APP_ENV') === 'local' 
+                            ? env('L5_SWAGGER_LOCAL_HOST', 'http://localhost:8000')
+                            : env('L5_SWAGGER_PRODUCTION_HOST', 'http://145.79.13.180'),
+                        'description' => env('APP_ENV') === 'local' ? 'Local Development' : 'Production Server',
                     ],
                 ],
             ],
