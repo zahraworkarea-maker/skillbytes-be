@@ -46,6 +46,12 @@ return [
                 'annotations' => [
                     base_path('app'),
                 ],
+                'servers' => [
+                    [
+                        'url' => env('L5_SWAGGER_CONST_HOST', 'http://145.79.13.180'),
+                        'description' => 'Production Server',
+                    ],
+                ],
             ],
         ],
     ],
