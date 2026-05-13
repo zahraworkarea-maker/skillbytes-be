@@ -16,6 +16,7 @@ class CaseSubmission extends Model
         'user_id',
         'case_id',
         'answer',
+        'submission_file',
         'submitted_at',
         'score',
         'feedback',

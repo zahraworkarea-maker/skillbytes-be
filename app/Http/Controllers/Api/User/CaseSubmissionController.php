@@ -26,20 +26,21 @@ class CaseSubmissionController extends Controller
      *     path="/api/pbl-submissions",
      *     operationId="submitCaseAnswer",
      *     tags={"PBL Submissions"},
-     *     summary="Submit answer for a PBL case (File upload)",
-     *     description="Submit an answer to a PBL case as a file upload. Can only submit once per case.",
+     *     summary="Submit answer for a PBL case",
+     *     description="Submit an answer to a PBL case with optional text and/or file upload. Can only submit once per case. Answer data includes user_id for scoring purposes.",
      *     security={{"bearer_token":{}}},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Case submission with file",
+     *         description="Case submission with answer text and/or file",
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                 required={"case_id","submission_file"},
+     *                 required={"case_id"},
      *                 @OA\Property(property="case_id", type="integer", example=1),
+     *                 @OA\Property(property="answer", type="string", description="Answer text (at least 10 characters, optional)"),
      *                 @OA\Property(
      *                     property="submission_file",
-     *                     description="Submission file (PDF, DOC, etc.)",
+     *                     description="Submission file (any format accepted)",
      *                     type="string",
      *                     format="binary"
      *                 ),
@@ -87,23 +88,30 @@ class CaseSubmissionController extends Controller
             ['started_at' => Carbon::now()]
         );
 
+        // Create submission
+        $submissionData = [
+            'user_id' => $user->id,
+            'case_id' => $case->id,
+            'submitted_at' => Carbon::now(),
+        ];
+
+        // Add answer if provided
+        if (!empty($validated['answer'])) {
+            $submissionData['answer'] = $validated['answer'];
+        }
+
         // Handle file upload
-        $filePath = null;
         if ($request->hasFile('submission_file')) {
             $file = $request->file('submission_file');
             $filename = time() . '_' . $user->id . '_' . \Str::random(8) . '.' . $file->getClientOriginalExtension();
             
             $filePath = Storage::disk('public')
                 ->putFileAs('submissions/pbl', $file, $filename);
+            
+            $submissionData['submission_file'] = $filePath;
         }
 
-        // Create submission
-        $submission = CaseSubmission::create([
-            'user_id' => $user->id,
-            'case_id' => $case->id,
-            'submission_file' => $filePath,
-            'submitted_at' => Carbon::now(),
-        ]);
+        $submission = CaseSubmission::create($submissionData);
 
         // Update progress as completed
         $progress->update(['completed_at' => Carbon::now()]);

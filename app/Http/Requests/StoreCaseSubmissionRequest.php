@@ -23,7 +23,8 @@ class StoreCaseSubmissionRequest extends FormRequest
     {
         return [
             'case_id' => 'required|integer|exists:pbl_cases,id',
-            'answer' => 'required|string|min:10',
+            'answer' => 'nullable|string|min:10',
+            'submission_file' => 'nullable|file',
         ];
     }
 
@@ -34,6 +35,7 @@ class StoreCaseSubmissionRequest extends FormRequest
     {
         return [
             'answer.min' => 'Answer must be at least 10 characters',
+            'submission_file.file' => 'The submission file must be a valid file',
         ];
     }
 }
