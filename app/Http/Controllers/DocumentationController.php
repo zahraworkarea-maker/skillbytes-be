@@ -11,7 +11,7 @@ class DocumentationController extends Controller
      */
     public function openapi()
     {
-        $specPath = storage_path('api-docs/openapi.yaml');
+        $specPath = storage_path('api-docs/api-docs.json');
 
         if (!file_exists($specPath)) {
             return response()->json([

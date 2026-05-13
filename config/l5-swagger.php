@@ -46,16 +46,6 @@ return [
                 'annotations' => [
                     base_path('app'),
                 ],
-                'servers' => [
-                    [
-                        'url' => env('L5_SWAGGER_LOCAL_HOST', 'http://localhost:8000'),
-                        'description' => 'Local Development',
-                    ],
-                    [
-                        'url' => env('L5_SWAGGER_PRODUCTION_HOST', 'http://145.79.13.180'),
-                        'description' => 'Production Server',
-                    ],
-                ],
             ],
         ],
     ],

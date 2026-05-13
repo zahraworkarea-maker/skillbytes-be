@@ -28,7 +28,7 @@ Added comprehensive role-based access control (RBAC) to all API endpoints with p
 
 ## Implementation Changes
 
-### 1. OpenAPI Specification Updated (`storage/api-docs/openapi.yaml`)
+### 1. OpenAPI Specification Updated (`storage/api-docs/api-docs.json`)
 - Added detailed description of authentication and RBAC in API info section
 - Each endpoint now includes:
   - **Authentication** requirement (Bearer Token)

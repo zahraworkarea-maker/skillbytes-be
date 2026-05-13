@@ -198,7 +198,7 @@ grep -i "UpdateUserRequest\|UserController.*DETAILED\|No profile photo provided"
 3. `routes/api/auth.php`
    - Route now accepts PUT, PATCH, and POST methods
 
-4. `storage/api-docs/openapi.yaml`
+4. `storage/api-docs/api-docs.json`
    - Updated documentation to reflect PUT/PATCH/POST methods
 
 ## Verification Steps

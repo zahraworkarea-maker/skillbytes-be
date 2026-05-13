@@ -22,12 +22,12 @@ class CaseSectionController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/pbl-cases/{pblCase}/sections",
+     *     path="/pbl-cases/{pblCase}/sections",
      *     operationId="getCaseSections",
      *     tags={"PBL Sections"},
      *     summary="Get sections of a case",
      *     description="Retrieve all sections for a specific case",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblCase",
      *         in="path",
@@ -51,12 +51,12 @@ class CaseSectionController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/pbl-cases/{pblCase}/sections",
+     *     path="/pbl-cases/{pblCase}/sections",
      *     operationId="createCaseSection",
      *     tags={"PBL Sections"},
      *     summary="Create a new section (Admin/Guru only)",
      *     description="Create a new section for a case",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblCase",
      *         in="path",
@@ -105,12 +105,12 @@ class CaseSectionController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/pbl-sections/{caseSection}",
+     *     path="/pbl-sections/{caseSection}",
      *     operationId="updateCaseSection",
      *     tags={"PBL Sections"},
      *     summary="Update a section (Admin/Guru only)",
      *     description="Update an existing section",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="caseSection",
      *         in="path",
@@ -154,12 +154,12 @@ class CaseSectionController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/pbl-sections/{caseSection}",
+     *     path="/pbl-sections/{caseSection}",
      *     operationId="deleteCaseSection",
      *     tags={"PBL Sections"},
      *     summary="Delete a section (Admin/Guru only)",
      *     description="Delete an existing section",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="caseSection",
      *         in="path",

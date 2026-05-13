@@ -16,12 +16,12 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Server(
- *     url="http://localhost:8000",
+ *     url="http://localhost:8000/api",
  *     description="Local Development"
  * )
  *
  * @OA\Server(
- *     url="http://145.79.13.180",
+ *     url="http://145.79.13.180/api",
  *     description="Production Server"
  * )
  *
@@ -30,7 +30,7 @@ namespace App\Http\Controllers;
  *         type="http",
  *         scheme="bearer",
  *         bearerFormat="JWT",
- *         securityScheme="bearer_token",
+ *         securityScheme="bearerAuth",
  *         description="Bearer token for API authentication"
  *     )
  * )

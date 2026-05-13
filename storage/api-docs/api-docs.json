@@ -13,16 +13,318 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000",
+            "url": "http://localhost:8000/api",
             "description": "Local Development"
         },
         {
-            "url": "http://145.79.13.180",
+            "url": "http://145.79.13.180/api",
             "description": "Production Server"
         }
     ],
     "paths": {
-        "/api/pbl-cases/{pblCase}/sections": {
+        "/admin/assessments": {
+            "post": {
+                "tags": [
+                    "Admin - Assessments"
+                ],
+                "summary": "Create new assessment",
+                "description": "Create a new assessment with title, description, and time limit. Only accessible by admin and guru.",
+                "operationId": "b8deed4479007d1ea4ed9e0dccb1b9ef",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "slug",
+                                    "title",
+                                    "time_limit"
+                                ],
+                                "properties": {
+                                    "slug": {
+                                        "description": "Unique slug for the assessment",
+                                        "type": "string",
+                                        "example": "math-quiz-2024"
+                                    },
+                                    "title": {
+                                        "description": "Assessment title",
+                                        "type": "string",
+                                        "example": "Math Quiz 2024"
+                                    },
+                                    "description": {
+                                        "description": "Assessment description",
+                                        "type": "string",
+                                        "example": "A comprehensive mathematics assessment",
+                                        "nullable": true
+                                    },
+                                    "time_limit": {
+                                        "description": "Time limit in minutes",
+                                        "type": "integer",
+                                        "example": 60
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Assessment created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Assessment created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "time_limit": {
+                                                    "type": "integer"
+                                                },
+                                                "total_questions": {
+                                                    "type": "integer"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error or slug already exists"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - only admin/guru can create"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/assessments/{id}": {
+            "put": {
+                "tags": [
+                    "Admin - Assessments"
+                ],
+                "summary": "Update assessment",
+                "description": "Update an existing assessment. Only accessible by admin and guru. Can update slug, title, description, and time limit.",
+                "operationId": "d4f41bbd53966422be93b1955b2f7844",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Assessment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "slug": {
+                                        "description": "Updated slug",
+                                        "type": "string",
+                                        "example": "math-quiz-2024-updated",
+                                        "nullable": true
+                                    },
+                                    "title": {
+                                        "description": "Updated title",
+                                        "type": "string",
+                                        "example": "Math Quiz 2024 Updated",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "description": "Updated description",
+                                        "type": "string",
+                                        "example": "Updated description",
+                                        "nullable": true
+                                    },
+                                    "time_limit": {
+                                        "description": "Updated time limit in minutes",
+                                        "type": "integer",
+                                        "example": 90,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assessment updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Assessment updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "time_limit": {
+                                                    "type": "integer"
+                                                },
+                                                "total_questions": {
+                                                    "type": "integer"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Assessments"
+                ],
+                "summary": "Delete assessment",
+                "description": "Delete an assessment permanently. Only accessible by admin and guru. Deleting an assessment will also delete all related questions and options.",
+                "operationId": "0c48da2beba0cbcb307169af5902e1b7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Assessment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Assessment deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Delete error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pbl-cases/{pblCase}/sections": {
             "get": {
                 "tags": [
                     "PBL Sections"
@@ -54,7 +356,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -115,12 +417,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-sections/{caseSection}": {
+        "/pbl-sections/{caseSection}": {
             "put": {
                 "tags": [
                     "PBL Sections"
@@ -170,7 +472,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -205,12 +507,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-sections/{caseSection}/items": {
+        "/pbl-sections/{caseSection}/items": {
             "post": {
                 "tags": [
                     "PBL Section Items"
@@ -278,12 +580,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-items/{caseSectionItem}": {
+        "/pbl-items/{caseSectionItem}": {
             "put": {
                 "tags": [
                     "PBL Section Items"
@@ -345,7 +647,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -380,12 +682,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/upload-image": {
+        "/upload-image": {
             "post": {
                 "tags": [
                     "Media"
@@ -449,12 +751,295 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-cases": {
+        "/admin/questions/{questionId}/options": {
+            "post": {
+                "tags": [
+                    "Admin - Options"
+                ],
+                "summary": "Create option for question",
+                "description": "Add a new option/answer choice to a question. One option must be marked as correct answer. Only accessible by admin and guru.",
+                "operationId": "e0c96bbedec5ab610d85ce426626b7b3",
+                "parameters": [
+                    {
+                        "name": "questionId",
+                        "in": "path",
+                        "description": "Question ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question_id",
+                                    "label",
+                                    "text",
+                                    "is_correct"
+                                ],
+                                "properties": {
+                                    "question_id": {
+                                        "description": "Question ID - must match URL parameter",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "label": {
+                                        "description": "Option label (A, B, C, D, etc.)",
+                                        "type": "string",
+                                        "example": "A"
+                                    },
+                                    "text": {
+                                        "description": "Option text/content",
+                                        "type": "string",
+                                        "example": "Paris"
+                                    },
+                                    "is_correct": {
+                                        "description": "Is this the correct answer",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Option created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "question_id": {
+                                                    "type": "integer"
+                                                },
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                },
+                                                "is_correct": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error or ID mismatch"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/options/{id}": {
+            "put": {
+                "tags": [
+                    "Admin - Options"
+                ],
+                "summary": "Update option",
+                "description": "Update an existing option. Only accessible by admin and guru.",
+                "operationId": "a355e6b4f5c8f75028d1b4ae0cb26a52",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "label": {
+                                        "description": "Updated label",
+                                        "type": "string",
+                                        "example": "B",
+                                        "nullable": true
+                                    },
+                                    "text": {
+                                        "description": "Updated text",
+                                        "type": "string",
+                                        "example": "Berlin",
+                                        "nullable": true
+                                    },
+                                    "is_correct": {
+                                        "description": "Updated correct answer flag",
+                                        "type": "boolean",
+                                        "example": false,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Option updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                },
+                                                "is_correct": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Option not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Options"
+                ],
+                "summary": "Delete option",
+                "description": "Delete an option from a question. Only accessible by admin and guru.",
+                "operationId": "120c8a89e25465bf40cf0ca33cda4e32",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Option deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Delete error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Option not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pbl-cases": {
             "get": {
                 "tags": [
                     "PBL Cases"
@@ -549,7 +1134,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -643,12 +1228,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-cases/{pblCase}": {
+        "/pbl-cases/{pblCase}": {
             "get": {
                 "tags": [
                     "PBL Cases"
@@ -773,7 +1358,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -839,7 +1424,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -877,12 +1462,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-levels": {
+        "/pbl-levels": {
             "get": {
                 "tags": [
                     "PBL Levels"
@@ -934,7 +1519,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -1012,12 +1597,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-levels/{pblLevel}": {
+        "/pbl-levels/{pblLevel}": {
             "get": {
                 "tags": [
                     "PBL Levels"
@@ -1080,7 +1665,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -1171,7 +1756,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -1209,12 +1794,898 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-submissions": {
+        "/admin/assessments/{assessmentId}/questions": {
+            "post": {
+                "tags": [
+                    "Admin - Questions"
+                ],
+                "summary": "Create question for assessment",
+                "description": "Add a new question to an assessment. Only accessible by admin and guru.",
+                "operationId": "59e8fa9bf93826bc3b7b445d69964c5f",
+                "parameters": [
+                    {
+                        "name": "assessmentId",
+                        "in": "path",
+                        "description": "Assessment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "description": "Question text",
+                                        "type": "string",
+                                        "example": "What is the capital of France?"
+                                    },
+                                    "explanation": {
+                                        "description": "Question explanation for review",
+                                        "type": "string",
+                                        "example": "France is located in Western Europe. Paris is the capital and largest city.",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "assessment_id": {
+                                                    "type": "integer"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                },
+                                                "explanation": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/questions/{id}": {
+            "put": {
+                "tags": [
+                    "Admin - Questions"
+                ],
+                "summary": "Update question",
+                "description": "Update an existing question. Only accessible by admin and guru.",
+                "operationId": "a6b411cce56f8abfd68fa0a891036bf5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Question ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "text": {
+                                        "description": "Updated question text",
+                                        "type": "string",
+                                        "example": "What is the capital of Germany?",
+                                        "nullable": true
+                                    },
+                                    "explanation": {
+                                        "description": "Updated explanation",
+                                        "type": "string",
+                                        "example": "Germany's capital is Berlin.",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                },
+                                                "explanation": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Questions"
+                ],
+                "summary": "Delete question",
+                "description": "Delete a question from an assessment. Only accessible by admin and guru. Deleting a question will also delete all its options and related answers.",
+                "operationId": "e41e6b31647d315ed990c15ffa7e32a2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Question ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Delete error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Question not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/results": {
+            "get": {
+                "tags": [
+                    "Admin - Results"
+                ],
+                "summary": "Get all assessment results",
+                "description": "Retrieve all assessment results from all users with pagination. Only accessible by admin and guru.",
+                "operationId": "1c0747d80fc8eff1ec693d0d02637644",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all assessment results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "assessment_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "COMPLETED"
+                                                    },
+                                                    "started_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "completed_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "count": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/results/{attemptId}": {
+            "get": {
+                "tags": [
+                    "Admin - Results"
+                ],
+                "summary": "Get assessment result detail",
+                "description": "Retrieve detailed result of a specific assessment attempt including all answers and correctness. Only accessible by admin and guru.",
+                "operationId": "010d7695ae3d5e12176afff0e0ad4a74",
+                "parameters": [
+                    {
+                        "name": "attemptId",
+                        "in": "path",
+                        "description": "Assessment Attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment result detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "assessment_id": {
+                                                    "type": "integer"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "COMPLETED"
+                                                },
+                                                "started_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "completed_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "answers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "question_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "question_text": {
+                                                                "type": "string"
+                                                            },
+                                                            "selected_option_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "selected_option_text": {
+                                                                "type": "string"
+                                                            },
+                                                            "is_correct": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "correct_option_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "correct_option_text": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Result not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/assessments": {
+            "get": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Get all assessments",
+                "description": "Retrieve a paginated list of all available assessments",
+                "operationId": "35185af340267c786a663d0b9ce65b96",
+                "responses": {
+                    "200": {
+                        "description": "List of assessments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "time_limit": {
+                                                        "description": "in minutes",
+                                                        "type": "integer"
+                                                    },
+                                                    "total_questions": {
+                                                        "type": "integer"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/assessments/{slug}": {
+            "get": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Get assessment detail with questions",
+                "description": "Retrieve detailed assessment with all questions and options. Note: is_correct field is NOT included to prevent answer leakage.",
+                "operationId": "9ed7f06ae19f486ed2fd386ae9732aa5",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Assessment slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment details with questions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "total_questions": {
+                                                    "type": "integer"
+                                                },
+                                                "time_limit": {
+                                                    "type": "integer"
+                                                },
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "question": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "label": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "text": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/assessments/{id}/start": {
+            "post": {
+                "tags": [
+                    "Assessment Attempts"
+                ],
+                "summary": "Start a new assessment attempt",
+                "description": "Begin taking an assessment. Only one active attempt allowed per assessment per user.",
+                "operationId": "714c7f298d3245c3706ef1a6d4d6c4ad",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Assessment ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Assessment attempt created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Assessment attempt started"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "attempt_id": {
+                                                    "type": "integer"
+                                                },
+                                                "assessment_id": {
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "IN_PROGRESS"
+                                                },
+                                                "started_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Assessment not found"
+                    },
+                    "400": {
+                        "description": "User already has active attempt"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/attempts/{attemptId}/answers": {
+            "post": {
+                "tags": [
+                    "Assessment Attempts"
+                ],
+                "summary": "Submit answer to a question",
+                "description": "Submit user's answer. Each question can only be answered once. Cannot answer after completion or timeout.",
+                "operationId": "6bd2cbce46274d9aa46a41aaa51ae17b",
+                "parameters": [
+                    {
+                        "name": "attemptId",
+                        "in": "path",
+                        "description": "Assessment Attempt ID",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "selected_option_id": {
+                                        "type": "integer",
+                                        "example": 4
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Answer submitted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Answer submitted"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "answer_id": {
+                                                    "type": "integer"
+                                                },
+                                                "is_correct": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Question already answered or attempt not in progress"
+                    },
+                    "404": {
+                        "description": "Attempt not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/attempts/{attemptId}/finish": {
+            "post": {
+                "tags": [
+                    "Assessment Attempts"
+                ],
+                "summary": "Complete assessment and get final score",
+                "description": "Finalize the assessment attempt. Calculates score automatically.",
+                "operationId": "d022bd36addafa397aa347cf96b7d9d7",
+                "parameters": [
+                    {
+                        "name": "attemptId",
+                        "in": "path",
+                        "description": "Assessment Attempt ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Assessment completed"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 80
+                                                },
+                                                "correct_answers": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "total_questions": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "COMPLETED"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Attempt timed out or not in progress"
+                    },
+                    "404": {
+                        "description": "Attempt not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pbl-submissions": {
             "get": {
                 "tags": [
                     "User - Case Submissions"
@@ -1232,7 +2703,7 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -1303,12 +2774,12 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/api/pbl-submissions/{id}": {
+        "/pbl-submissions/{id}": {
             "get": {
                 "tags": [
                     "User - Case Submissions"
@@ -1340,7 +2811,1955 @@
                 },
                 "security": [
                     {
-                        "bearer_token": []
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/my-results": {
+            "get": {
+                "tags": [
+                    "Results"
+                ],
+                "summary": "Get all user's assessment results",
+                "description": "Retrieve all completed assessment attempts for the authenticated user",
+                "operationId": "f74bd66c5def295eec175f14f31ef918",
+                "responses": {
+                    "200": {
+                        "description": "List of user's results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "assessment": {
+                                                        "type": "object"
+                                                    },
+                                                    "score": {
+                                                        "type": "number"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "started_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "completed_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/my-results/{attemptId}": {
+            "get": {
+                "tags": [
+                    "Results"
+                ],
+                "summary": "Get user's specific result detail",
+                "description": "Retrieve detailed result of a specific assessment attempt including all answers, options, and correct answers for review",
+                "operationId": "d29cb4912b76b6359dfdedb071037b2e",
+                "parameters": [
+                    {
+                        "name": "attemptId",
+                        "in": "path",
+                        "description": "Assessment Attempt ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment result detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Result not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register new user",
+                "description": "Create a new user account. Default role is 'siswa' (student).",
+                "operationId": "b1b01b32c29a44dbd4e1d296fba35be4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "User full name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "description": "User email address",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "username": {
+                                        "description": "Unique username",
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "description": "Password (min 8 characters)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Register successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "email": {
+                                                            "type": "string"
+                                                        },
+                                                        "username": {
+                                                            "type": "string"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "siswa"
+                                                        },
+                                                        "is_active": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "description": "Bearer token for authentication",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/auth/user/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user",
+                "description": "Authenticate user with email and password. Returns user data and bearer token.",
+                "operationId": "fed2bcc32a923df508d2aaf0722154e7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "email": {
+                                                            "type": "string"
+                                                        },
+                                                        "username": {
+                                                            "type": "string"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "siswa",
+                                                                "guru",
+                                                                "admin"
+                                                            ]
+                                                        },
+                                                        "is_active": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "description": "Bearer token for authentication",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials or inactive account"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout user",
+                "description": "Logout current user and invalidate the authentication token.",
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout successful"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get paginated lessons",
+                "description": "Retrieve paginated list of lessons for authenticated user.",
+                "operationId": "e1abe40dbd1870d06943517976c11507",
+                "parameters": [
+                    {
+                        "name": "pagesize",
+                        "in": "query",
+                        "description": "Page size (default: 15)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated lessons",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lessons retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "integer"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Create new lesson",
+                "description": "Create a new lesson. Only accessible to admin and guru roles.",
+                "operationId": "b196bee153377a601911ff0db5a9aa01",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "slug",
+                                    "level_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "description": "Lesson title",
+                                        "type": "string"
+                                    },
+                                    "slug": {
+                                        "description": "Unique slug",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Lesson description",
+                                        "type": "string"
+                                    },
+                                    "level_id": {
+                                        "description": "Level ID",
+                                        "type": "integer"
+                                    },
+                                    "content": {
+                                        "description": "Lesson content",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Lesson created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lesson created successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons/all": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get all lessons without pagination",
+                "description": "Retrieve all available lessons for authenticated user without pagination.",
+                "operationId": "9b7f43441a93211d748aebd89ee1665a",
+                "responses": {
+                    "200": {
+                        "description": "All lessons",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All lessons retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons/{slug}": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get lesson by slug",
+                "description": "Retrieve detailed lesson information by slug.",
+                "operationId": "0eb3af9adfc3bb46fdf6f8351af5a895",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Lesson slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lesson retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Update lesson",
+                "description": "Update an existing lesson. Use POST for form-data/file uploads. Only accessible to admin and guru roles.",
+                "operationId": "69936bffdef69b4a66f54d3bad82c0ff",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Lesson slug",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Updated title",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Updated description",
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "description": "Updated content",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lesson updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lesson updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Delete lesson",
+                "description": "Delete a lesson permanently. Only accessible to admin and guru roles.",
+                "operationId": "3ca7a08e5894f12ceac8afc28c99acc3",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Lesson slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lesson deleted successfully"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons/by-level/{level}": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get lessons by level",
+                "description": "Retrieve all lessons for a specific level.",
+                "operationId": "e5bd01cc1dfc7d046d140dd18f62b2c6",
+                "parameters": [
+                    {
+                        "name": "level",
+                        "in": "path",
+                        "description": "Level number",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lessons by level",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lessons by level retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Level not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons/completed": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get completed lessons",
+                "description": "Retrieve all lessons completed by the authenticated user.",
+                "operationId": "84fe4f6085548f7d26c91f68c362bb29",
+                "responses": {
+                    "200": {
+                        "description": "Completed lessons",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Completed lessons retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/levels": {
+            "get": {
+                "tags": [
+                    "Levels"
+                ],
+                "summary": "Get paginated levels",
+                "description": "Retrieve paginated list of learning levels.",
+                "operationId": "7a44321486ccf18b092538f69cdd9dc9",
+                "parameters": [
+                    {
+                        "name": "pagesize",
+                        "in": "query",
+                        "description": "Page size (default: 15)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated levels",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Levels retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Levels"
+                ],
+                "summary": "Create new level",
+                "description": "Create a new learning level. Only accessible to admin and guru roles.",
+                "operationId": "f476b431420da9716f8b06eb3126738c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "level_number"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Level name",
+                                        "type": "string"
+                                    },
+                                    "level_number": {
+                                        "description": "Level number",
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "description": "Level description",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Level created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Level created successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/levels/all": {
+            "get": {
+                "tags": [
+                    "Levels"
+                ],
+                "summary": "Get all levels with lessons",
+                "description": "Retrieve all learning levels with their associated lessons.",
+                "operationId": "b405363be9ca13becffb3fa0d533a170",
+                "responses": {
+                    "200": {
+                        "description": "All levels with lessons",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All levels retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/levels/{level}": {
+            "get": {
+                "tags": [
+                    "Levels"
+                ],
+                "summary": "Get level by number",
+                "description": "Retrieve detailed information of a specific level by level number.",
+                "operationId": "19a84dc8cf9d286d0d2127f729909c78",
+                "parameters": [
+                    {
+                        "name": "level",
+                        "in": "path",
+                        "description": "Level number",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Level retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Level retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Level not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Levels"
+                ],
+                "summary": "Update level",
+                "description": "Update an existing learning level. Only accessible to admin and guru roles.",
+                "operationId": "5070abf2406c05db94e618148708b832",
+                "parameters": [
+                    {
+                        "name": "level",
+                        "in": "path",
+                        "description": "Level number",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Updated name",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Updated description",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Level updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Level updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Level not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Levels"
+                ],
+                "summary": "Delete level",
+                "description": "Delete a learning level permanently. Only accessible to admin and guru roles.",
+                "operationId": "e343c3ea27f6a62e75192105c30d7985",
+                "parameters": [
+                    {
+                        "name": "level",
+                        "in": "path",
+                        "description": "Level number",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Level deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Level deleted successfully"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Level not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List users with pagination",
+                "description": "Retrieve paginated list of users with optional search and sorting. Accessible to all authenticated users.",
+                "operationId": "c7c8b0bbdabc65fa72d3329389965863",
+                "parameters": [
+                    {
+                        "name": "pagesize",
+                        "in": "query",
+                        "description": "Page size (default: 15)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "pagenumber",
+                        "in": "query",
+                        "description": "Page number (default: 1)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query (searches name, email, username)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortby",
+                        "in": "query",
+                        "description": "Sort field (default: created_at)",
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "created_at",
+                                "name",
+                                "email"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sorttype",
+                        "in": "query",
+                        "description": "Sort direction (default: desc)",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Users retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "username": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user/all": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users without pagination",
+                "description": "Retrieve all users without pagination. Only accessible to admin and guru roles.",
+                "operationId": "36433f024254fa86dc5dfdec3480e6c6",
+                "responses": {
+                    "200": {
+                        "description": "All users retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All users retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "username": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - only admin and guru"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user by ID",
+                "description": "Retrieve detailed information of a specific user by ID.",
+                "operationId": "bf1c45632d2c50a6ca999987fb3bb855",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "username": {
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user",
+                "description": "Update user information. Use POST when uploading files/form-data. Supports partial updates via PATCH/PUT with JSON body.",
+                "operationId": "5c0bd419b952e48f8a3beb3cfdc4a068",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Updated user data",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "User full name",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "User email",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "username": {
+                                        "description": "Username",
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "description": "User role",
+                                        "type": "string",
+                                        "enum": [
+                                            "siswa",
+                                            "guru",
+                                            "admin"
+                                        ]
+                                    },
+                                    "is_active": {
+                                        "description": "Active status",
+                                        "type": "boolean"
+                                    },
+                                    "profile_photo": {
+                                        "description": "Optional profile photo",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user",
+                "description": "Delete a user account permanently. Only accessible to admin and guru roles.",
+                "operationId": "006f02ccf13251ad6a64810c9f444c72",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User deleted successfully"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - only admin and guru"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/user/": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create new user",
+                "description": "Create a new user account. Only accessible to admin and guru roles. Supports profile photo upload.",
+                "operationId": "fd40778daa88e51a9a449defb4ac2aae",
+                "requestBody": {
+                    "description": "User data with optional profile photo",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "username",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane@example.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "janedoe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "siswa",
+                                            "guru",
+                                            "admin"
+                                        ],
+                                        "example": "siswa"
+                                    },
+                                    "profile_photo": {
+                                        "description": "Optional profile photo",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "username": {
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - only admin and guru"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons/{lesson}/mark-completed": {
+            "post": {
+                "tags": [
+                    "User Progress"
+                ],
+                "summary": "Mark lesson as completed",
+                "description": "Mark a lesson as completed for the authenticated user.",
+                "operationId": "7070f08bd1d9f90b1dd70b63e3548c57",
+                "parameters": [
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "lesson_id": {
+                                        "description": "Lesson ID",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lesson marked as completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "lessonId": {
+                                            "type": "integer"
+                                        },
+                                        "completed": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "completedAt": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/my-progress": {
+            "get": {
+                "tags": [
+                    "User Progress"
+                ],
+                "summary": "Get user's progress",
+                "description": "Retrieve the authenticated user's overall progress including completed lessons and levels.",
+                "operationId": "e75e84df39c24f90348d8727514b23f0",
+                "responses": {
+                    "200": {
+                        "description": "User progress retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "userId": {
+                                            "type": "integer"
+                                        },
+                                        "totalLessons": {
+                                            "type": "integer"
+                                        },
+                                        "completedLessons": {
+                                            "type": "integer"
+                                        },
+                                        "progressPercentage": {
+                                            "type": "number",
+                                            "format": "float"
+                                        },
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -1348,7 +4767,7 @@
     },
     "components": {
         "securitySchemes": {
-            "bearer_token": {
+            "bearerAuth": {
                 "type": "http",
                 "description": "Bearer token for API authentication",
                 "bearerFormat": "JWT",
@@ -1382,8 +4801,56 @@
             "description": "PBL case submissions (file upload)"
         },
         {
+            "name": "Admin - Assessments",
+            "description": "Admin - Assessments"
+        },
+        {
+            "name": "Admin - Options",
+            "description": "Admin - Options"
+        },
+        {
+            "name": "Admin - Questions",
+            "description": "Admin - Questions"
+        },
+        {
+            "name": "Admin - Results",
+            "description": "Admin - Results"
+        },
+        {
+            "name": "Assessments",
+            "description": "Assessments"
+        },
+        {
+            "name": "Assessment Attempts",
+            "description": "Assessment Attempts"
+        },
+        {
             "name": "User - Case Submissions",
             "description": "User - Case Submissions"
+        },
+        {
+            "name": "Results",
+            "description": "Results"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Lessons",
+            "description": "Lessons"
+        },
+        {
+            "name": "Levels",
+            "description": "Levels"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
+        },
+        {
+            "name": "User Progress",
+            "description": "User Progress"
         }
     ]
 }

@@ -17,3 +17,4 @@ require __DIR__ . '/api/learning.php';
 require __DIR__ . '/api/file.php';
 require __DIR__ . '/api/users.php';
 require __DIR__ . '/api/pbl.php';
+require __DIR__ . '/api/assessments.php';

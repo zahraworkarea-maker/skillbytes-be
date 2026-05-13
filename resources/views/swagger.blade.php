@@ -42,7 +42,7 @@
     <script>
         window.onload = function () {
             const ui = SwaggerUIBundle({
-                url: "{{ route('api.openapi') }}",
+                url: "/docs/api-docs.json",
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
@@ -54,6 +54,13 @@
                 ],
                 layout: "StandaloneLayout",
                 persistAuthorization: true,
+                requestInterceptor: (request) => {
+                    const token = localStorage.getItem('auth_token');
+                    if (token) {
+                        request.headers['Authorization'] = `Bearer ${token}`;
+                    }
+                    return request;
+                }
             })
 
             window.ui = ui

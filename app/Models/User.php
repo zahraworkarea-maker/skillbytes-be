@@ -75,4 +75,30 @@ class User extends Authenticatable
     {
         return $this->hasMany(CaseSubmission::class);
     }
+
+    public function assessmentAttempts(): HasMany
+    {
+        return $this->hasMany(AssessmentAttempt::class);
+    }
+
+    // Helper methods for role checking
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::ADMIN;
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === UserRole::GURU;
+    }
+
+    public function isSiswa(): bool
+    {
+        return $this->role === UserRole::SISWA;
+    }
+
+    public function isAdminOrGuru(): bool
+    {
+        return $this->isAdmin() || $this->isGuru();
+    }
 }

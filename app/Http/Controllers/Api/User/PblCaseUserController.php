@@ -18,12 +18,12 @@ class PblCaseUserController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/pbl-cases",
+     *     path="/pbl-cases",
      *     operationId="listPblCases",
      *     tags={"PBL Cases"},
      *     summary="List all PBL cases",
      *     description="Retrieve all available PBL cases with current user's status",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
@@ -84,12 +84,12 @@ class PblCaseUserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/pbl-cases/{pblCase}",
+     *     path="/pbl-cases/{pblCase}",
      *     operationId="getPblCase",
      *     tags={"PBL Cases"},
      *     summary="Get PBL case details",
      *     description="Retrieve full details of a specific PBL case including all sections and items",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblCase",
      *         in="path",

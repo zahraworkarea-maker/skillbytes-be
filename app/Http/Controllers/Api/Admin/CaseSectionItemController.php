@@ -22,12 +22,12 @@ class CaseSectionItemController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/pbl-sections/{caseSection}/items",
+     *     path="/pbl-sections/{caseSection}/items",
      *     operationId="createSectionItem",
      *     tags={"PBL Section Items"},
      *     summary="Create a section item (Admin/Guru only)",
      *     description="Create a new item in a section",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="caseSection",
      *         in="path",
@@ -78,12 +78,12 @@ class CaseSectionItemController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/pbl-items/{caseSectionItem}",
+     *     path="/pbl-items/{caseSectionItem}",
      *     operationId="updateSectionItem",
      *     tags={"PBL Section Items"},
      *     summary="Update a section item (Admin/Guru only)",
      *     description="Update an existing section item",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="caseSectionItem",
      *         in="path",
@@ -129,12 +129,12 @@ class CaseSectionItemController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/pbl-items/{caseSectionItem}",
+     *     path="/pbl-items/{caseSectionItem}",
      *     operationId="deleteSectionItem",
      *     tags={"PBL Section Items"},
      *     summary="Delete a section item (Admin/Guru only)",
      *     description="Delete an existing section item",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="caseSectionItem",
      *         in="path",

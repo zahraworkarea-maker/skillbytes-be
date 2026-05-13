@@ -23,12 +23,12 @@ class CaseSubmissionController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/pbl-submissions",
+     *     path="/pbl-submissions",
      *     operationId="submitCaseAnswer",
      *     tags={"PBL Submissions"},
      *     summary="Submit answer for a PBL case",
      *     description="Submit an answer to a PBL case with optional text and/or file upload. Can only submit once per case. Answer data includes user_id for scoring purposes.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         description="Case submission with answer text and/or file",
@@ -124,12 +124,12 @@ class CaseSubmissionController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/pbl-submissions",
+     *     path="/pbl-submissions",
      *     operationId="getUserSubmissions",
      *     tags={"User - Case Submissions"},
      *     summary="Get user's submissions",
      *     description="Retrieve all submissions made by the current user",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="List of user's submissions"
@@ -147,12 +147,12 @@ class CaseSubmissionController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/pbl-submissions/{id}",
+     *     path="/pbl-submissions/{id}",
      *     operationId="getSubmission",
      *     tags={"User - Case Submissions"},
      *     summary="Get submission details",
      *     description="Get details of a specific submission",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

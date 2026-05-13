@@ -21,12 +21,12 @@ class PblLevelController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/pbl-levels",
+     *     path="/pbl-levels",
      *     operationId="listPblLevels",
      *     tags={"PBL Levels"},
      *     summary="Get all PBL levels",
      *     description="Retrieve all PBL levels available in the system. Accessible to all authenticated users.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="List of PBL levels retrieved successfully",
@@ -61,12 +61,12 @@ class PblLevelController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/pbl-levels/{pblLevel}",
+     *     path="/pbl-levels/{pblLevel}",
      *     operationId="getPblLevel",
      *     tags={"PBL Levels"},
      *     summary="Get a specific PBL level",
      *     description="Retrieve details of a specific PBL level by ID. Accessible to all authenticated users.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblLevel",
      *         in="path",
@@ -104,12 +104,12 @@ class PblLevelController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/pbl-levels",
+     *     path="/pbl-levels",
      *     operationId="createPblLevel",
      *     tags={"PBL Levels"},
      *     summary="Create a new PBL level (Admin only)",
      *     description="Create a new PBL level. Only accessible to Admin role.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         description="PBL level data",
@@ -160,12 +160,12 @@ class PblLevelController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/pbl-levels/{pblLevel}",
+     *     path="/pbl-levels/{pblLevel}",
      *     operationId="updatePblLevel",
      *     tags={"PBL Levels"},
      *     summary="Update a PBL level (Admin only)",
      *     description="Update an existing PBL level. Only accessible to Admin role.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblLevel",
      *         in="path",
@@ -223,12 +223,12 @@ class PblLevelController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/pbl-levels/{pblLevel}",
+     *     path="/pbl-levels/{pblLevel}",
      *     operationId="deletePblLevel",
      *     tags={"PBL Levels"},
      *     summary="Delete a PBL level (Admin only)",
      *     description="Delete an existing PBL level. Only accessible to Admin role.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblLevel",
      *         in="path",

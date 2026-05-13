@@ -22,12 +22,12 @@ class PblCaseController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/pbl-cases",
+     *     path="/pbl-cases",
      *     operationId="createPblCase",
      *     tags={"PBL Cases"},
      *     summary="Create a new PBL case (Admin/Guru only)",
      *     description="Create a new PBL case with all details. Only accessible to Admin and Guru roles.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         description="PBL case data",
@@ -83,12 +83,12 @@ class PblCaseController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/pbl-cases/{pblCase}",
+     *     path="/pbl-cases/{pblCase}",
      *     operationId="updatePblCase",
      *     tags={"PBL Cases"},
      *     summary="Update a PBL case (Admin/Guru only)",
      *     description="Update an existing PBL case. Only accessible to Admin and Guru roles.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblCase",
      *         in="path",
@@ -136,12 +136,12 @@ class PblCaseController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/pbl-cases/{pblCase}",
+     *     path="/pbl-cases/{pblCase}",
      *     operationId="deletePblCase",
      *     tags={"PBL Cases"},
      *     summary="Delete a PBL case (Admin/Guru only)",
      *     description="Delete an existing PBL case. Only accessible to Admin and Guru roles.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="pblCase",
      *         in="path",

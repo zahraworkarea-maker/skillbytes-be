@@ -19,12 +19,12 @@ class ImageUploadController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/upload-image",
+     *     path="/upload-image",
      *     operationId="uploadImage",
      *     tags={"Media"},
      *     summary="Upload an image (Admin/Guru only)",
      *     description="Upload an image for PBL cases or section items. Only accessible to Admin and Guru roles.",
-     *     security={{"bearer_token":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         description="Image file",

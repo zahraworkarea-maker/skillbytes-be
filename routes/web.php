@@ -16,7 +16,7 @@ Route::get('/', function () {
 // API Documentation Routes
 Route::prefix('docs')->group(function () {
     Route::get('/', [DocumentationController::class, 'swagger'])->name('docs.swagger');
-    Route::get('/openapi.yaml', [DocumentationController::class, 'openapi'])->name('api.openapi');
+    Route::get('/api-docs.json', [DocumentationController::class, 'openapi'])->name('api.openapi');
 });
 
 // ✅ FIX PDF ROUTE
