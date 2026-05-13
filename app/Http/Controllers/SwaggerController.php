@@ -17,7 +17,12 @@ namespace App\Http\Controllers;
  *
  * @OA\Server(
  *     url="http://localhost:8000",
- *     description="Development server"
+ *     description="Local Development"
+ * )
+ *
+ * @OA\Server(
+ *     url="http://145.79.13.180",
+ *     description="Production Server"
  * )
  *
  * @OA\Components(
