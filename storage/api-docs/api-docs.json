@@ -825,14 +825,14 @@
                 ]
             }
         },
-        "/admin/questions/{questionId}/options": {
+        "/questions/{questionId}/options": {
             "post": {
                 "tags": [
                     "Admin - Options"
                 ],
                 "summary": "Create option for question",
                 "description": "Add a new option/answer choice to a question. One option must be marked as correct answer. Only accessible by admin and guru.",
-                "operationId": "e0c96bbedec5ab610d85ce426626b7b3",
+                "operationId": "99dec860677e1c4302f9031f9d000097",
                 "parameters": [
                     {
                         "name": "questionId",
@@ -943,14 +943,14 @@
                 ]
             }
         },
-        "/admin/options/{id}": {
+        "/options/{id}": {
             "put": {
                 "tags": [
                     "Admin - Options"
                 ],
                 "summary": "Update option",
                 "description": "Update an existing option. Only accessible by admin and guru.",
-                "operationId": "a355e6b4f5c8f75028d1b4ae0cb26a52",
+                "operationId": "f20038d811182f6815d36ab8e59bd5b8",
                 "parameters": [
                     {
                         "name": "id",
@@ -1055,7 +1055,7 @@
                 ],
                 "summary": "Delete option",
                 "description": "Delete an option from a question. Only accessible by admin and guru.",
-                "operationId": "120c8a89e25465bf40cf0ca33cda4e32",
+                "operationId": "b5dd32fea4250691df95b3fee2f8fd0c",
                 "parameters": [
                     {
                         "name": "id",
@@ -1868,14 +1868,14 @@
                 ]
             }
         },
-        "/admin/assessments/{assessmentId}/questions": {
+        "/assessments/{assessmentId}/questions": {
             "post": {
                 "tags": [
                     "Admin - Questions"
                 ],
                 "summary": "Create question for assessment",
                 "description": "Add a new question to an assessment. Only accessible by admin and guru.",
-                "operationId": "59e8fa9bf93826bc3b7b445d69964c5f",
+                "operationId": "d6afc9355831c4fc868e50549f46843b",
                 "parameters": [
                     {
                         "name": "assessmentId",
@@ -1972,14 +1972,14 @@
                 ]
             }
         },
-        "/admin/questions/{id}": {
+        "/questions/{id}": {
             "put": {
                 "tags": [
                     "Admin - Questions"
                 ],
                 "summary": "Update question",
                 "description": "Update an existing question. Only accessible by admin and guru.",
-                "operationId": "a6b411cce56f8abfd68fa0a891036bf5",
+                "operationId": "fd6850fb0f6c3aa214ced74f8bfb9064",
                 "parameters": [
                     {
                         "name": "id",
@@ -2076,7 +2076,7 @@
                 ],
                 "summary": "Delete question",
                 "description": "Delete a question from an assessment. Only accessible by admin and guru. Deleting a question will also delete all its options and related answers.",
-                "operationId": "e41e6b31647d315ed990c15ffa7e32a2",
+                "operationId": "a9f1a64f8c853c4827b55ef8afc9fe82",
                 "parameters": [
                     {
                         "name": "id",

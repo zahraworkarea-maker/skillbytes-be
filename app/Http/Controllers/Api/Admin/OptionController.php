@@ -19,7 +19,7 @@ class OptionController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/admin/questions/{questionId}/options",
+     *     path="/questions/{questionId}/options",
      *     summary="Create option for question",
      *     description="Add a new option/answer choice to a question. One option must be marked as correct answer. Only accessible by admin and guru.",
      *     tags={"Admin - Options"},
@@ -105,7 +105,7 @@ class OptionController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/admin/options/{id}",
+     *     path="/options/{id}",
      *     summary="Update option",
      *     description="Update an existing option. Only accessible by admin and guru.",
      *     tags={"Admin - Options"},
@@ -179,7 +179,7 @@ class OptionController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/admin/options/{id}",
+     *     path="/options/{id}",
      *     summary="Delete option",
      *     description="Delete an option from a question. Only accessible by admin and guru.",
      *     tags={"Admin - Options"},
