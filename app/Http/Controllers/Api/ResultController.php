@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\User;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AssessmentResultResource;
@@ -17,14 +17,28 @@ class ResultController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/my-results",
-     *     summary="Get all user's assessment results",
-     *     description="Retrieve all completed assessment attempts for the authenticated user",
+     *     path="/results",
+     *     summary="Get assessment results",
+     *     description="Retrieve assessment results. Users see only their own results, admins/gurus see all results with pagination.",
      *     tags={"Results"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination (admin only)",
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Items per page (admin only)",
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of user's results",
+     *         description="List of assessment results",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="array", @OA\Items(
@@ -38,25 +52,44 @@ class ResultController extends Controller
      *                 @OA\Property(property="created_at", type="string", format="date-time")
      *             ))
      *         )
-     *     )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $results = $this->attemptService->getUserResults($user);
+        $isAdmin = $user->hasRole('admin', 'guru');
 
-        return response()->json([
-            'success' => true,
-            'data' => AssessmentAttemptResource::collection($results),
-        ]);
+        if ($isAdmin) {
+            // Admin sees all results with pagination
+            $results = $this->attemptService->getAllAttempts();
+            return response()->json([
+                'success' => true,
+                'data' => AssessmentAttemptResource::collection($results->items()),
+                'pagination' => [
+                    'total' => $results->total(),
+                    'count' => $results->count(),
+                    'per_page' => $results->perPage(),
+                    'current_page' => $results->currentPage(),
+                    'last_page' => $results->lastPage(),
+                ],
+            ]);
+        } else {
+            // User sees only their results
+            $results = $this->attemptService->getUserResults($user);
+            return response()->json([
+                'success' => true,
+                'data' => AssessmentAttemptResource::collection($results),
+            ]);
+        }
     }
 
     /**
      * @OA\Get(
-     *     path="/my-results/{attemptId}",
-     *     summary="Get user's specific result detail",
-     *     description="Retrieve detailed result of a specific assessment attempt including all answers, options, and correct answers for review",
+     *     path="/results/{attemptId}",
+     *     summary="Get specific result detail",
+     *     description="Retrieve detailed result of a specific assessment attempt. Users can only view their own results, admins/gurus can view any result.",
      *     tags={"Results"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -73,13 +106,22 @@ class ResultController extends Controller
      *             @OA\Property(property="data", type="object")
      *         )
      *     ),
+     *     @OA\Response(response=403, description="Forbidden"),
      *     @OA\Response(response=404, description="Result not found")
      * )
      */
     public function show(int $attemptId, Request $request): JsonResponse
     {
         $user = $request->user();
-        $result = $this->attemptService->getUserResult($attemptId, $user);
+        $isAdmin = $user->hasRole('admin', 'guru');
+
+        if ($isAdmin) {
+            // Admin can view any result
+            $result = $this->attemptService->getAttemptDetail($attemptId);
+        } else {
+            // User can only view their own result
+            $result = $this->attemptService->getUserResult($attemptId, $user);
+        }
 
         if (!$result) {
             return response()->json([

@@ -2129,19 +2129,19 @@
                 ]
             }
         },
-        "/admin/results": {
+        "/results": {
             "get": {
                 "tags": [
-                    "Admin - Results"
+                    "Results"
                 ],
-                "summary": "Get all assessment results",
-                "description": "Retrieve all assessment results from all users with pagination. Only accessible by admin and guru.",
-                "operationId": "1c0747d80fc8eff1ec693d0d02637644",
+                "summary": "Get assessment results",
+                "description": "Retrieve assessment results. Users see only their own results, admins/gurus see all results with pagination.",
+                "operationId": "8c95c7a1224123981aea23b7aa64201d",
                 "parameters": [
                     {
                         "name": "page",
                         "in": "query",
-                        "description": "Page number for pagination",
+                        "description": "Page number for pagination (admin only)",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -2151,7 +2151,7 @@
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Items per page",
+                        "description": "Items per page (admin only)",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -2161,7 +2161,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of all assessment results",
+                        "description": "List of assessment results",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2175,21 +2175,19 @@
                                             "items": {
                                                 "properties": {
                                                     "id": {
-                                                        "type": "integer"
+                                                        "type": "string"
                                                     },
                                                     "user_id": {
-                                                        "type": "integer"
+                                                        "type": "string"
                                                     },
-                                                    "assessment_id": {
-                                                        "type": "integer"
+                                                    "assessment": {
+                                                        "type": "object"
                                                     },
                                                     "score": {
-                                                        "type": "number",
-                                                        "format": "float"
+                                                        "type": "number"
                                                     },
                                                     "status": {
-                                                        "type": "string",
-                                                        "example": "COMPLETED"
+                                                        "type": "string"
                                                     },
                                                     "started_at": {
                                                         "type": "string",
@@ -2197,8 +2195,7 @@
                                                     },
                                                     "completed_at": {
                                                         "type": "string",
-                                                        "format": "date-time",
-                                                        "nullable": true
+                                                        "format": "date-time"
                                                     },
                                                     "created_at": {
                                                         "type": "string",
@@ -2207,26 +2204,6 @@
                                                 },
                                                 "type": "object"
                                             }
-                                        },
-                                        "pagination": {
-                                            "properties": {
-                                                "total": {
-                                                    "type": "integer"
-                                                },
-                                                "count": {
-                                                    "type": "integer"
-                                                },
-                                                "per_page": {
-                                                    "type": "integer"
-                                                },
-                                                "current_page": {
-                                                    "type": "integer"
-                                                },
-                                                "last_page": {
-                                                    "type": "integer"
-                                                }
-                                            },
-                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -2236,9 +2213,6 @@
                     },
                     "401": {
                         "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -2248,23 +2222,20 @@
                 ]
             }
         },
-        "/admin/results/{attemptId}": {
+        "/results/{attemptId}": {
             "get": {
                 "tags": [
-                    "Admin - Results"
+                    "Results"
                 ],
-                "summary": "Get assessment result detail",
-                "description": "Retrieve detailed result of a specific assessment attempt including all answers and correctness. Only accessible by admin and guru.",
-                "operationId": "010d7695ae3d5e12176afff0e0ad4a74",
+                "summary": "Get specific result detail",
+                "description": "Retrieve detailed result of a specific assessment attempt. Users can only view their own results, admins/gurus can view any result.",
+                "operationId": "ca3168723962586f10582cece073f951",
                 "parameters": [
                     {
                         "name": "attemptId",
                         "in": "path",
                         "description": "Assessment Attempt ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -2279,65 +2250,6 @@
                                             "example": true
                                         },
                                         "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "user_id": {
-                                                    "type": "integer"
-                                                },
-                                                "assessment_id": {
-                                                    "type": "integer"
-                                                },
-                                                "score": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                },
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "COMPLETED"
-                                                },
-                                                "started_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "completed_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "answers": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "question_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "question_text": {
-                                                                "type": "string"
-                                                            },
-                                                            "selected_option_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "selected_option_text": {
-                                                                "type": "string"
-                                                            },
-                                                            "is_correct": {
-                                                                "type": "boolean"
-                                                            },
-                                                            "correct_option_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "correct_option_text": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
                                             "type": "object"
                                         }
                                     },
@@ -2345,9 +2257,6 @@
                                 }
                             }
                         }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -2805,121 +2714,6 @@
                     },
                     "401": {
                         "description": "Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/my-results": {
-            "get": {
-                "tags": [
-                    "Results"
-                ],
-                "summary": "Get all user's assessment results",
-                "description": "Retrieve all completed assessment attempts for the authenticated user",
-                "operationId": "f74bd66c5def295eec175f14f31ef918",
-                "responses": {
-                    "200": {
-                        "description": "List of user's results",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "string"
-                                                    },
-                                                    "user_id": {
-                                                        "type": "string"
-                                                    },
-                                                    "assessment": {
-                                                        "type": "object"
-                                                    },
-                                                    "score": {
-                                                        "type": "number"
-                                                    },
-                                                    "status": {
-                                                        "type": "string"
-                                                    },
-                                                    "started_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "completed_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/my-results/{attemptId}": {
-            "get": {
-                "tags": [
-                    "Results"
-                ],
-                "summary": "Get user's specific result detail",
-                "description": "Retrieve detailed result of a specific assessment attempt including all answers, options, and correct answers for review",
-                "operationId": "d29cb4912b76b6359dfdedb071037b2e",
-                "parameters": [
-                    {
-                        "name": "attemptId",
-                        "in": "path",
-                        "description": "Assessment Attempt ID",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Assessment result detail",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Result not found"
                     }
                 },
                 "security": [
@@ -4811,8 +4605,8 @@
             "description": "Questions"
         },
         {
-            "name": "Admin - Results",
-            "description": "Admin - Results"
+            "name": "Results",
+            "description": "Results"
         },
         {
             "name": "Assessment Attempts",
@@ -4821,10 +4615,6 @@
         {
             "name": "User - Case Submissions",
             "description": "User - Case Submissions"
-        },
-        {
-            "name": "Results",
-            "description": "Results"
         },
         {
             "name": "Authentication",

@@ -3,9 +3,8 @@
 use App\Http\Controllers\Api\Admin\AssessmentController as AdminAssessmentController;
 use App\Http\Controllers\Api\Admin\OptionController;
 use App\Http\Controllers\Api\Admin\QuestionController;
-use App\Http\Controllers\Api\Admin\ResultController as AdminResultController;
+use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\User\AssessmentController;
-use App\Http\Controllers\Api\User\ResultController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -18,8 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{attemptId}/finish', 'finishAttempt');
     });
 
-    // Student results endpoints
-    Route::prefix('my-results')->controller(ResultController::class)->group(function () {
+    // Results endpoints (unified for both user and admin)
+    Route::prefix('results')->controller(ResultController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/{attemptId}', 'show');
     });
@@ -45,12 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/questions/{questionId}/options', 'store');
             Route::put('/options/{id}', 'update');
             Route::delete('/options/{id}', 'destroy');
-        });
-
-        // Results Management
-        Route::controller(AdminResultController::class)->group(function () {
-            Route::get('/results', 'index');
-            Route::get('/results/{attemptId}', 'show');
         });
     });
 });
