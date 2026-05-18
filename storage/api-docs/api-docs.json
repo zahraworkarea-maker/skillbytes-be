@@ -22,14 +22,83 @@
         }
     ],
     "paths": {
-        "/admin/assessments": {
+        "/assessments": {
+            "get": {
+                "tags": [
+                    "Assessments"
+                ],
+                "summary": "Get all assessments",
+                "description": "Retrieve a paginated list of all available assessments",
+                "operationId": "35185af340267c786a663d0b9ce65b96",
+                "responses": {
+                    "200": {
+                        "description": "List of assessments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "time_limit": {
+                                                        "description": "in minutes",
+                                                        "type": "integer"
+                                                    },
+                                                    "total_questions": {
+                                                        "type": "integer"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Admin - Assessments"
                 ],
                 "summary": "Create new assessment",
                 "description": "Create a new assessment with title, description, and time limit. Only accessible by admin and guru.",
-                "operationId": "b8deed4479007d1ea4ed9e0dccb1b9ef",
+                "operationId": "2cd1cb01988bbf877994e67e8a0bbebf",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -138,14 +207,14 @@
                 ]
             }
         },
-        "/admin/assessments/{id}": {
+        "/assessments/{id}": {
             "put": {
                 "tags": [
                     "Admin - Assessments"
                 ],
                 "summary": "Update assessment",
                 "description": "Update an existing assessment. Only accessible by admin and guru. Can update slug, title, description, and time limit.",
-                "operationId": "d4f41bbd53966422be93b1955b2f7844",
+                "operationId": "d64b50f60cc523e0001bc43d3f5b9613",
                 "parameters": [
                     {
                         "name": "id",
@@ -271,7 +340,7 @@
                 ],
                 "summary": "Delete assessment",
                 "description": "Delete an assessment permanently. Only accessible by admin and guru. Deleting an assessment will also delete all related questions and options.",
-                "operationId": "0c48da2beba0cbcb307169af5902e1b7",
+                "operationId": "a958f314e38df4a377db6cf4a4accd6a",
                 "parameters": [
                     {
                         "name": "id",
@@ -2285,77 +2354,6 @@
                     },
                     "404": {
                         "description": "Result not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/assessments": {
-            "get": {
-                "tags": [
-                    "Assessments"
-                ],
-                "summary": "Get all assessments",
-                "description": "Retrieve a paginated list of all available assessments",
-                "operationId": "35185af340267c786a663d0b9ce65b96",
-                "responses": {
-                    "200": {
-                        "description": "List of assessments",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "slug": {
-                                                        "type": "string"
-                                                    },
-                                                    "title": {
-                                                        "type": "string"
-                                                    },
-                                                    "description": {
-                                                        "type": "string"
-                                                    },
-                                                    "time_limit": {
-                                                        "description": "in minutes",
-                                                        "type": "integer"
-                                                    },
-                                                    "total_questions": {
-                                                        "type": "integer"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "pagination": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
                 },
                 "security": [

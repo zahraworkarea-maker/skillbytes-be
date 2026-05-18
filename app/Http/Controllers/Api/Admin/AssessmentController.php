@@ -19,7 +19,7 @@ class AssessmentController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/admin/assessments",
+     *     path="/assessments",
      *     summary="Create new assessment",
      *     description="Create a new assessment with title, description, and time limit. Only accessible by admin and guru.",
      *     tags={"Admin - Assessments"},
@@ -77,7 +77,7 @@ class AssessmentController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/admin/assessments/{id}",
+     *     path="/assessments/{id}",
      *     summary="Update assessment",
      *     description="Update an existing assessment. Only accessible by admin and guru. Can update slug, title, description, and time limit.",
      *     tags={"Admin - Assessments"},
@@ -154,7 +154,7 @@ class AssessmentController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/admin/assessments/{id}",
+     *     path="/assessments/{id}",
      *     summary="Delete assessment",
      *     description="Delete an assessment permanently. Only accessible by admin and guru. Deleting an assessment will also delete all related questions and options.",
      *     tags={"Admin - Assessments"},

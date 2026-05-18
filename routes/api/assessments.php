@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Admin/Guru endpoints
-    Route::middleware('role:admin,guru')->prefix('admin')->group(function () {
+    Route::middleware('role:admin,guru')->group(function () {
         // Assessment CRUD
         Route::controller(AdminAssessmentController::class)->group(function () {
             Route::post('/assessments', 'store');
