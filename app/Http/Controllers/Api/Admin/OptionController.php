@@ -21,8 +21,8 @@ class OptionController extends Controller
      * @OA\Post(
      *     path="/questions/{questionId}/options",
      *     summary="Create option for question",
-     *     description="Add a new option/answer choice to a question. One option must be marked as correct answer. Only accessible by admin and guru.",
-     *     tags={"Admin - Options"},
+     *     description="Add a new option/answer choice to a question where one option must be marked as the correct answer. This endpoint creates answer options for admin and guru roles.",
+     *     tags={"Options"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="questionId",
@@ -107,8 +107,8 @@ class OptionController extends Controller
      * @OA\Put(
      *     path="/options/{id}",
      *     summary="Update option",
-     *     description="Update an existing option. Only accessible by admin and guru.",
-     *     tags={"Admin - Options"},
+     *     description="Update an existing option including label, text, and correct answer flag. This endpoint modifies option details for admin and guru roles.",
+     *     tags={"Options"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -181,8 +181,8 @@ class OptionController extends Controller
      * @OA\Delete(
      *     path="/options/{id}",
      *     summary="Delete option",
-     *     description="Delete an option from a question. Only accessible by admin and guru.",
-     *     tags={"Admin - Options"},
+     *     description="Delete an option from a question. This endpoint removes the answer choice from the system for admin and guru roles.",
+     *     tags={"Options"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",

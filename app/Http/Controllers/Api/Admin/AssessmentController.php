@@ -21,8 +21,8 @@ class AssessmentController extends Controller
      * @OA\Post(
      *     path="/assessments",
      *     summary="Create new assessment",
-     *     description="Create a new assessment with title, description, and time limit. Only accessible by admin and guru.",
-     *     tags={"Admin - Assessments"},
+     *     description="Create a new assessment with title, description, and time limit. This endpoint is used to add a new assessment to the system for admin and guru roles.",
+     *     tags={"Assessments"},
      *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
@@ -79,8 +79,8 @@ class AssessmentController extends Controller
      * @OA\Put(
      *     path="/assessments/{id}",
      *     summary="Update assessment",
-     *     description="Update an existing assessment. Only accessible by admin and guru. Can update slug, title, description, and time limit.",
-     *     tags={"Admin - Assessments"},
+     *     description="Update an existing assessment including slug, title, description, and time limit. This endpoint modifies assessment details for admin and guru roles.",
+     *     tags={"Assessments"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -156,8 +156,8 @@ class AssessmentController extends Controller
      * @OA\Delete(
      *     path="/assessments/{id}",
      *     summary="Delete assessment",
-     *     description="Delete an assessment permanently. Only accessible by admin and guru. Deleting an assessment will also delete all related questions and options.",
-     *     tags={"Admin - Assessments"},
+     *     description="Delete an assessment permanently including all related questions and options. This endpoint removes the assessment from the system for admin and guru roles.",
+     *     tags={"Assessments"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",

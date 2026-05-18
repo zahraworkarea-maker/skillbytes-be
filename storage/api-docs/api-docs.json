@@ -94,10 +94,10 @@
             },
             "post": {
                 "tags": [
-                    "Admin - Assessments"
+                    "Assessments"
                 ],
                 "summary": "Create new assessment",
-                "description": "Create a new assessment with title, description, and time limit. Only accessible by admin and guru.",
+                "description": "Create a new assessment with title, description, and time limit. This endpoint is used to add a new assessment to the system for admin and guru roles.",
                 "operationId": "2cd1cb01988bbf877994e67e8a0bbebf",
                 "requestBody": {
                     "required": true,
@@ -210,10 +210,10 @@
         "/assessments/{id}": {
             "put": {
                 "tags": [
-                    "Admin - Assessments"
+                    "Assessments"
                 ],
                 "summary": "Update assessment",
-                "description": "Update an existing assessment. Only accessible by admin and guru. Can update slug, title, description, and time limit.",
+                "description": "Update an existing assessment including slug, title, description, and time limit. This endpoint modifies assessment details for admin and guru roles.",
                 "operationId": "d64b50f60cc523e0001bc43d3f5b9613",
                 "parameters": [
                     {
@@ -336,10 +336,10 @@
             },
             "delete": {
                 "tags": [
-                    "Admin - Assessments"
+                    "Assessments"
                 ],
                 "summary": "Delete assessment",
-                "description": "Delete an assessment permanently. Only accessible by admin and guru. Deleting an assessment will also delete all related questions and options.",
+                "description": "Delete an assessment permanently including all related questions and options. This endpoint removes the assessment from the system for admin and guru roles.",
                 "operationId": "a958f314e38df4a377db6cf4a4accd6a",
                 "parameters": [
                     {
@@ -828,10 +828,10 @@
         "/questions/{questionId}/options": {
             "post": {
                 "tags": [
-                    "Admin - Options"
+                    "Options"
                 ],
                 "summary": "Create option for question",
-                "description": "Add a new option/answer choice to a question. One option must be marked as correct answer. Only accessible by admin and guru.",
+                "description": "Add a new option/answer choice to a question where one option must be marked as the correct answer. This endpoint creates answer options for admin and guru roles.",
                 "operationId": "99dec860677e1c4302f9031f9d000097",
                 "parameters": [
                     {
@@ -946,10 +946,10 @@
         "/options/{id}": {
             "put": {
                 "tags": [
-                    "Admin - Options"
+                    "Options"
                 ],
                 "summary": "Update option",
-                "description": "Update an existing option. Only accessible by admin and guru.",
+                "description": "Update an existing option including label, text, and correct answer flag. This endpoint modifies option details for admin and guru roles.",
                 "operationId": "f20038d811182f6815d36ab8e59bd5b8",
                 "parameters": [
                     {
@@ -1051,10 +1051,10 @@
             },
             "delete": {
                 "tags": [
-                    "Admin - Options"
+                    "Options"
                 ],
                 "summary": "Delete option",
-                "description": "Delete an option from a question. Only accessible by admin and guru.",
+                "description": "Delete an option from a question. This endpoint removes the answer choice from the system for admin and guru roles.",
                 "operationId": "b5dd32fea4250691df95b3fee2f8fd0c",
                 "parameters": [
                     {
@@ -1871,10 +1871,10 @@
         "/assessments/{assessmentId}/questions": {
             "post": {
                 "tags": [
-                    "Admin - Questions"
+                    "Questions"
                 ],
                 "summary": "Create question for assessment",
-                "description": "Add a new question to an assessment. Only accessible by admin and guru.",
+                "description": "Add a new question to an assessment. This endpoint creates a question and associates it with the specified assessment for admin and guru roles.",
                 "operationId": "d6afc9355831c4fc868e50549f46843b",
                 "parameters": [
                     {
@@ -1975,10 +1975,10 @@
         "/questions/{id}": {
             "put": {
                 "tags": [
-                    "Admin - Questions"
+                    "Questions"
                 ],
                 "summary": "Update question",
-                "description": "Update an existing question. Only accessible by admin and guru.",
+                "description": "Update an existing question including text and explanation. This endpoint modifies question details for admin and guru roles.",
                 "operationId": "fd6850fb0f6c3aa214ced74f8bfb9064",
                 "parameters": [
                     {
@@ -2072,10 +2072,10 @@
             },
             "delete": {
                 "tags": [
-                    "Admin - Questions"
+                    "Questions"
                 ],
                 "summary": "Delete question",
-                "description": "Delete a question from an assessment. Only accessible by admin and guru. Deleting a question will also delete all its options and related answers.",
+                "description": "Delete a question including all its options and related answers. This endpoint removes the question from the system for admin and guru roles.",
                 "operationId": "a9f1a64f8c853c4827b55ef8afc9fe82",
                 "parameters": [
                     {
@@ -4799,24 +4799,20 @@
             "description": "PBL case submissions (file upload)"
         },
         {
-            "name": "Admin - Assessments",
-            "description": "Admin - Assessments"
+            "name": "Assessments",
+            "description": "Assessments"
         },
         {
-            "name": "Admin - Options",
-            "description": "Admin - Options"
+            "name": "Options",
+            "description": "Options"
         },
         {
-            "name": "Admin - Questions",
-            "description": "Admin - Questions"
+            "name": "Questions",
+            "description": "Questions"
         },
         {
             "name": "Admin - Results",
             "description": "Admin - Results"
-        },
-        {
-            "name": "Assessments",
-            "description": "Assessments"
         },
         {
             "name": "Assessment Attempts",

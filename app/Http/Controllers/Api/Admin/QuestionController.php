@@ -21,8 +21,8 @@ class QuestionController extends Controller
      * @OA\Post(
      *     path="/assessments/{assessmentId}/questions",
      *     summary="Create question for assessment",
-     *     description="Add a new question to an assessment. Only accessible by admin and guru.",
-     *     tags={"Admin - Questions"},
+     *     description="Add a new question to an assessment. This endpoint creates a question and associates it with the specified assessment for admin and guru roles.",
+     *     tags={"Questions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="assessmentId",
@@ -95,8 +95,8 @@ class QuestionController extends Controller
      * @OA\Put(
      *     path="/questions/{id}",
      *     summary="Update question",
-     *     description="Update an existing question. Only accessible by admin and guru.",
-     *     tags={"Admin - Questions"},
+     *     description="Update an existing question including text and explanation. This endpoint modifies question details for admin and guru roles.",
+     *     tags={"Questions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -166,8 +166,8 @@ class QuestionController extends Controller
      * @OA\Delete(
      *     path="/questions/{id}",
      *     summary="Delete question",
-     *     description="Delete a question from an assessment. Only accessible by admin and guru. Deleting a question will also delete all its options and related answers.",
-     *     tags={"Admin - Questions"},
+     *     description="Delete a question including all its options and related answers. This endpoint removes the question from the system for admin and guru roles.",
+     *     tags={"Questions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
