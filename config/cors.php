@@ -22,7 +22,7 @@ return [
     // Read allowed origins from env to avoid hardcoded host mismatches.
     'allowed_origins' => array_filter(array_map('trim', explode(',', env(
         'CORS_ALLOWED_ORIGINS',
-        'http://localhost:3000,http://localhost:8000,http://127.0.0.1:3000,http://127.0.0.1:8000'
+        'http://localhost:3000,http://localhost:8000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://145.79.13.180:9254,http://145.79.13.180'
     )))),
 
     'allowed_origins_patterns' => [],
