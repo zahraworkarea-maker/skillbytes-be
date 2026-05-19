@@ -19,6 +19,7 @@ class QuestionWithAnswerResource extends JsonResource
             'id' => (string) $this->id,
             'question' => $this->text,
             'explanation' => $this->explanation,
+            'image_path' => $this->image_path,
             'options' => OptionWithAnswerResource::collection($this->options),
         ];
     }

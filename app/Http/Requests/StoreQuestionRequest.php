@@ -25,6 +25,7 @@ class StoreQuestionRequest extends FormRequest
             'questions' => 'required|array|min:1|max:1000',
             'questions.*.text' => 'required|string',
             'questions.*.explanation' => 'nullable|string',
+            'questions.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ];
     }
 
@@ -36,6 +37,9 @@ class StoreQuestionRequest extends FormRequest
             'questions.min' => 'At least 1 question is required',
             'questions.max' => 'Maximum 1000 questions allowed per request',
             'questions.*.text.required' => 'Question text is required for each question',
+            'questions.*.image.image' => 'Image must be a valid image file',
+            'questions.*.image.mimes' => 'Image must be in jpeg, png, jpg, or gif format',
+            'questions.*.image.max' => 'Image size must not exceed 5MB',
         ];
     }
 }

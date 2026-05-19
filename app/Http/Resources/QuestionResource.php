@@ -18,6 +18,7 @@ class QuestionResource extends JsonResource
         return [
             'id' => (string) $this->id,
             'question' => $this->text,
+            'image_path' => $this->image_path,
             'options' => OptionResource::collection($this->options),
         ];
     }

@@ -15,6 +15,7 @@ class Question extends Model
         'assessment_id',
         'text',
         'explanation',
+        'image_path',
     ];
 
     // Relationships

@@ -21,7 +21,7 @@ class QuestionController extends Controller
      * @OA\Post(
      *     path="/assessments/{assessmentId}/questions",
      *     summary="Create multiple questions in bulk for assessment",
-     *     description="Add multiple questions to an assessment in a single request. This bulk endpoint allows creating up to 1000 questions at once and associates them with the specified assessment for admin and guru roles.",
+     *     description="Add multiple questions to an assessment in a single request. This bulk endpoint allows creating up to 1000 questions at once. Supports file upload for question images.",
      *     tags={"Questions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -32,16 +32,41 @@ class QuestionController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"questions"},
-     *             @OA\Property(
-     *                 property="questions",
-     *                 type="array",
-     *                 description="Array of questions to create",
-     *                 @OA\Items(
-     *                     @OA\Property(property="text", type="string", example="What is the capital of France?", description="Question text"),
-     *                     @OA\Property(property="explanation", type="string", nullable=true, example="France is located in Western Europe.", description="Question explanation")
+    *         required=false,
+     *         description="Questions data with optional images",
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="questions[0][text]",
+     *                     type="string",
+     *                     description="Question text",
+     *                     example="What is the capital of France?"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="questions[0][explanation]",
+     *                     type="string",
+     *                     nullable=true,
+     *                     description="Question explanation (optional)",
+     *                     example="France is located in Western Europe."
+     *                 ),
+     *                 @OA\Property(
+     *                     property="questions[0][image]",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Question image file (optional, max 5MB, formats: jpeg, png, jpg, gif)"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="questions[1][text]",
+     *                     type="string",
+     *                     description="Second question text"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="questions[1][image]",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Second question image (optional)"
      *                 )
      *             )
      *         )
@@ -59,7 +84,8 @@ class QuestionController extends Controller
      *                         @OA\Property(property="id", type="integer"),
      *                         @OA\Property(property="assessment_id", type="integer"),
      *                         @OA\Property(property="text", type="string"),
-     *                         @OA\Property(property="explanation", type="string", nullable=true)
+     *                         @OA\Property(property="explanation", type="string", nullable=true),
+     *                         @OA\Property(property="image_path", type="string", nullable=true, description="Path to the question image")
      *                     )
      *                 )
      *             )
@@ -92,6 +118,7 @@ class QuestionController extends Controller
                     'assessment_id' => $question->assessment_id,
                     'text' => $question->text,
                     'explanation' => $question->explanation,
+                    'image_path' => $question->image_path,
                 ];
             }, $questions);
 
@@ -115,7 +142,7 @@ class QuestionController extends Controller
      * @OA\Put(
      *     path="/questions/{id}",
      *     summary="Update question",
-     *     description="Update an existing question including text and explanation. This endpoint modifies question details for admin and guru roles.",
+     *     description="Update an existing question including text, explanation, and image file. Supports image file upload.",
      *     tags={"Questions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -126,10 +153,33 @@ class QuestionController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="text", type="string", nullable=true, example="What is the capital of Germany?", description="Updated question text"),
-     *             @OA\Property(property="explanation", type="string", nullable=true, example="Germany's capital is Berlin.", description="Updated explanation")
+    *         required=false,
+     *         description="Updated question data with optional image",
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="text",
+     *                     type="string",
+     *                     nullable=true,
+     *                     description="Updated question text",
+     *                     example="What is the capital of Germany?"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="explanation",
+     *                     type="string",
+     *                     nullable=true,
+     *                     description="Updated explanation",
+     *                     example="Germany's capital is Berlin."
+     *                 ),
+     *                 @OA\Property(
+     *                     property="image",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Updated question image file (optional, max 5MB, formats: jpeg, png, jpg, gif)"
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -141,7 +191,8 @@ class QuestionController extends Controller
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer"),
      *                 @OA\Property(property="text", type="string"),
-     *                 @OA\Property(property="explanation", type="string", nullable=true)
+     *                 @OA\Property(property="explanation", type="string", nullable=true),
+     *                 @OA\Property(property="image_path", type="string", nullable=true, description="Path to the question image")
      *             )
      *         )
      *     ),
@@ -172,6 +223,7 @@ class QuestionController extends Controller
                     'id' => $question->id,
                     'text' => $question->text,
                     'explanation' => $question->explanation,
+                    'image_path' => $question->image_path,
                 ],
             ]);
         } catch (\Exception $e) {

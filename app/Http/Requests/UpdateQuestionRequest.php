@@ -24,6 +24,7 @@ class UpdateQuestionRequest extends FormRequest
         return [
             'text' => 'sometimes|required|string',
             'explanation' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ];
     }
 }

@@ -1891,7 +1891,7 @@
                     "Questions"
                 ],
                 "summary": "Create multiple questions in bulk for assessment",
-                "description": "Add multiple questions to an assessment in a single request. This bulk endpoint allows creating up to 1000 questions at once and associates them with the specified assessment for admin and guru roles.",
+                "description": "Add multiple questions to an assessment in a single request. This bulk endpoint allows creating up to 1000 questions at once. Supports file upload for question images.",
                 "operationId": "d6afc9355831c4fc868e50549f46843b",
                 "parameters": [
                     {
@@ -1905,33 +1905,36 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
+                    "description": "Questions data with optional images",
+                    "required": false,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "required": [
-                                    "questions"
-                                ],
                                 "properties": {
-                                    "questions": {
-                                        "description": "Array of questions to create",
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "text": {
-                                                    "description": "Question text",
-                                                    "type": "string",
-                                                    "example": "What is the capital of France?"
-                                                },
-                                                "explanation": {
-                                                    "description": "Question explanation",
-                                                    "type": "string",
-                                                    "example": "France is located in Western Europe.",
-                                                    "nullable": true
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
+                                    "questions[0][text]": {
+                                        "description": "Question text",
+                                        "type": "string",
+                                        "example": "What is the capital of France?"
+                                    },
+                                    "questions[0][explanation]": {
+                                        "description": "Question explanation (optional)",
+                                        "type": "string",
+                                        "example": "France is located in Western Europe.",
+                                        "nullable": true
+                                    },
+                                    "questions[0][image]": {
+                                        "description": "Question image file (optional, max 5MB, formats: jpeg, png, jpg, gif)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "questions[1][text]": {
+                                        "description": "Second question text",
+                                        "type": "string"
+                                    },
+                                    "questions[1][image]": {
+                                        "description": "Second question image (optional)",
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -1976,6 +1979,11 @@
                                                             "explanation": {
                                                                 "type": "string",
                                                                 "nullable": true
+                                                            },
+                                                            "image_path": {
+                                                                "description": "Path to the question image",
+                                                                "type": "string",
+                                                                "nullable": true
                                                             }
                                                         },
                                                         "type": "object"
@@ -2016,7 +2024,7 @@
                     "Questions"
                 ],
                 "summary": "Update question",
-                "description": "Update an existing question including text and explanation. This endpoint modifies question details for admin and guru roles.",
+                "description": "Update an existing question including text, explanation, and image file. Supports image file upload.",
                 "operationId": "fd6850fb0f6c3aa214ced74f8bfb9064",
                 "parameters": [
                     {
@@ -2030,9 +2038,10 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
+                    "description": "Updated question data with optional image",
+                    "required": false,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "properties": {
                                     "text": {
@@ -2046,6 +2055,11 @@
                                         "type": "string",
                                         "example": "Germany's capital is Berlin.",
                                         "nullable": true
+                                    },
+                                    "image": {
+                                        "description": "Updated question image file (optional, max 5MB, formats: jpeg, png, jpg, gif)",
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -2077,6 +2091,11 @@
                                                     "type": "string"
                                                 },
                                                 "explanation": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "image_path": {
+                                                    "description": "Path to the question image",
                                                     "type": "string",
                                                     "nullable": true
                                                 }
