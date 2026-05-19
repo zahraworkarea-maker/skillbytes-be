@@ -103,9 +103,8 @@ class AttemptService
     public function getUserResults(User $user): Collection
     {
         return $user->assessmentAttempts()
-            ->where('status', AssessmentAttemptStatus::COMPLETED)
             ->with(['assessment'])
-            ->latest('completed_at')
+            ->latest('updated_at')
             ->get();
     }
 

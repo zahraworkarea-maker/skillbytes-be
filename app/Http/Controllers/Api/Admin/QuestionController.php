@@ -20,8 +20,8 @@ class QuestionController extends Controller
     /**
      * @OA\Post(
      *     path="/assessments/{assessmentId}/questions",
-     *     summary="Create question for assessment",
-     *     description="Add a new question to an assessment. This endpoint creates a question and associates it with the specified assessment for admin and guru roles.",
+     *     summary="Create multiple questions in bulk for assessment",
+     *     description="Add multiple questions to an assessment in a single request. This bulk endpoint allows creating up to 1000 questions at once and associates them with the specified assessment for admin and guru roles.",
      *     tags={"Questions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -34,22 +34,34 @@ class QuestionController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"text"},
-     *             @OA\Property(property="text", type="string", example="What is the capital of France?", description="Question text"),
-     *             @OA\Property(property="explanation", type="string", nullable=true, example="France is located in Western Europe. Paris is the capital and largest city.", description="Question explanation for review")
+     *             required={"questions"},
+     *             @OA\Property(
+     *                 property="questions",
+     *                 type="array",
+     *                 description="Array of questions to create",
+     *                 @OA\Items(
+     *                     @OA\Property(property="text", type="string", example="What is the capital of France?", description="Question text"),
+     *                     @OA\Property(property="explanation", type="string", nullable=true, example="France is located in Western Europe.", description="Question explanation")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Question created successfully",
+     *         description="Questions created successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Question created successfully"),
+     *             @OA\Property(property="message", type="string", example="10 questions created successfully"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="assessment_id", type="integer"),
-     *                 @OA\Property(property="text", type="string"),
-     *                 @OA\Property(property="explanation", type="string", nullable=true)
+     *                 @OA\Property(property="total_created", type="integer", example=10),
+     *                 @OA\Property(property="questions", type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="assessment_id", type="integer"),
+     *                         @OA\Property(property="text", type="string"),
+     *                         @OA\Property(property="explanation", type="string", nullable=true)
+     *                     )
+     *                 )
      *             )
      *         )
      *     ),
@@ -71,16 +83,24 @@ class QuestionController extends Controller
         }
 
         try {
-            $question = $this->questionService->createQuestion($assessment, $request->validated());
+            $validated = $request->validated();
+            $questions = $this->questionService->createBulkQuestions($assessment, $validated['questions']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question created successfully',
-                'data' => [
+            $questionsData = array_map(function ($question) {
+                return [
                     'id' => $question->id,
                     'assessment_id' => $question->assessment_id,
                     'text' => $question->text,
                     'explanation' => $question->explanation,
+                ];
+            }, $questions);
+
+            return response()->json([
+                'success' => true,
+                'message' => count($questions) . ' questions created successfully',
+                'data' => [
+                    'total_created' => count($questions),
+                    'questions' => $questionsData,
                 ],
             ], 201);
         } catch (\Exception $e) {

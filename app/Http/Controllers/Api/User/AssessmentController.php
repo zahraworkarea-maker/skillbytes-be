@@ -186,9 +186,9 @@ class AssessmentController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/attempts/{attemptId}/answers",
-     *     summary="Submit answer to a question",
-     *     description="Submit user's answer. Each question can only be answered once. Cannot answer after completion or timeout.",
+     *     path="/assessments/{attemptId}/answers",
+     *     summary="Submit answer(s) to question(s)",
+     *     description="Submit user's answer(s). Supports both single and bulk submissions. Each question can only be answered once. Cannot answer after completion or timeout.",
      *     tags={"Assessment Attempts"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -200,20 +200,29 @@ class AssessmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="question_id", type="integer", example=1),
-     *             @OA\Property(property="selected_option_id", type="integer", example=4)
+     *             oneOf={
+     *                 @OA\Schema(
+     *                     title="Single Answer",
+     *                     @OA\Property(property="question_id", type="integer", example=1),
+     *                     @OA\Property(property="selected_option_id", type="string", format="uuid", example="550e8400-e29b-41d4-a716-446655440000")
+     *                 ),
+     *                 @OA\Schema(
+     *                     title="Bulk Answers",
+     *                     @OA\Property(property="answers", type="array", @OA\Items(
+     *                         @OA\Property(property="question_id", type="integer", example=1),
+     *                         @OA\Property(property="selected_option_id", type="string", format="uuid", example="550e8400-e29b-41d4-a716-446655440000")
+     *                     ))
+     *                 )
+     *             }
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Answer submitted",
+     *         description="Answer(s) submitted",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Answer submitted"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="answer_id", type="integer"),
-     *                 @OA\Property(property="is_correct", type="boolean")
-     *             )
+     *             @OA\Property(property="data", type="object")
      *         )
      *     ),
      *     @OA\Response(response=400, description="Question already answered or attempt not in progress"),
@@ -233,20 +242,36 @@ class AssessmentController extends Controller
         }
 
         try {
-            $answer = $this->answerService->submitAnswer(
-                $attempt,
-                $request->question_id,
-                $request->selected_option_id
-            );
+            // Check if bulk submission or single submission
+            if ($request->has('answers')) {
+                // Bulk submission
+                $result = $this->answerService->submitAnswersBulk(
+                    $attempt,
+                    $request->answers
+                );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Answer submitted',
-                'data' => [
-                    'answer_id' => $answer->id,
-                    'is_correct' => $answer->is_correct,
-                ],
-            ], 201);
+                return response()->json([
+                    'success' => true,
+                    'message' => "Submitted {$result['success_count']} answers",
+                    'data' => $result,
+                ], 201);
+            } else {
+                // Single submission
+                $answer = $this->answerService->submitAnswer(
+                    $attempt,
+                    $request->question_id,
+                    $request->selected_option_id
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Answer submitted',
+                    'data' => [
+                        'answer_id' => $answer->id,
+                        'is_correct' => $answer->is_correct,
+                    ],
+                ], 201);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -257,7 +282,7 @@ class AssessmentController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/attempts/{attemptId}/finish",
+     *     path="/assessments/{attemptId}/finish",
      *     summary="Complete assessment and get final score",
      *     description="Finalize the assessment attempt. Calculates score automatically.",
      *     tags={"Assessment Attempts"},

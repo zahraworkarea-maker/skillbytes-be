@@ -20,8 +20,8 @@ class OptionController extends Controller
     /**
      * @OA\Post(
      *     path="/questions/{questionId}/options",
-     *     summary="Create option for question",
-     *     description="Add a new option/answer choice to a question where one option must be marked as the correct answer. This endpoint creates answer options for admin and guru roles.",
+     *     summary="Create multiple options in bulk for question",
+     *     description="Add multiple option/answer choices to a question in a single request. This bulk endpoint allows creating up to 1000 options at once for admin and guru roles. At least one option must be marked as the correct answer.",
      *     tags={"Options"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -34,29 +34,40 @@ class OptionController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"question_id","label","text","is_correct"},
-     *             @OA\Property(property="question_id", type="integer", example=1, description="Question ID - must match URL parameter"),
-     *             @OA\Property(property="label", type="string", example="A", description="Option label (A, B, C, D, etc.)"),
-     *             @OA\Property(property="text", type="string", example="Paris", description="Option text/content"),
-     *             @OA\Property(property="is_correct", type="boolean", example=true, description="Is this the correct answer")
+     *             required={"options"},
+     *             @OA\Property(
+     *                 property="options",
+     *                 type="array",
+     *                 description="Array of options to create",
+     *                 @OA\Items(
+     *                     @OA\Property(property="label", type="string", example="A", description="Option label (A, B, C, D, etc.)"),
+     *                     @OA\Property(property="text", type="string", example="Paris", description="Option text/content"),
+     *                     @OA\Property(property="is_correct", type="boolean", example=true, description="Is this the correct answer")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Option created successfully",
+     *         description="Options created successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Option created successfully"),
+     *             @OA\Property(property="message", type="string", example="4 options created successfully"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="question_id", type="integer"),
-     *                 @OA\Property(property="label", type="string"),
-     *                 @OA\Property(property="text", type="string"),
-     *                 @OA\Property(property="is_correct", type="boolean")
+     *                 @OA\Property(property="total_created", type="integer", example=4),
+     *                 @OA\Property(property="options", type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="string", format="uuid"),
+     *                         @OA\Property(property="question_id", type="integer"),
+     *                         @OA\Property(property="label", type="string"),
+     *                         @OA\Property(property="text", type="string"),
+     *                         @OA\Property(property="is_correct", type="boolean")
+     *                     )
+     *                 )
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=400, description="Validation error or ID mismatch"),
+     *     @OA\Response(response=400, description="Validation error"),
      *     @OA\Response(response=401, description="Unauthorized"),
      *     @OA\Response(response=403, description="Forbidden"),
      *     @OA\Response(response=404, description="Question not found")
@@ -73,26 +84,26 @@ class OptionController extends Controller
             ], 404);
         }
 
-        // Validate question_id in request matches URL parameter
-        if ($request->question_id != $questionId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Question ID mismatch',
-            ], 400);
-        }
-
         try {
-            $option = $this->optionService->createOption($question, $request->validated());
+            $validated = $request->validated();
+            $options = $this->optionService->createBulkOptions($question, $validated['options']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Option created successfully',
-                'data' => [
+            $optionsData = array_map(function ($option) {
+                return [
                     'id' => $option->id,
                     'question_id' => $option->question_id,
                     'label' => $option->label,
                     'text' => $option->text,
                     'is_correct' => $option->is_correct,
+                ];
+            }, $options);
+
+            return response()->json([
+                'success' => true,
+                'message' => count($options) . ' options created successfully',
+                'data' => [
+                    'total_created' => count($options),
+                    'options' => $optionsData,
                 ],
             ], 201);
         } catch (\Exception $e) {
@@ -114,8 +125,8 @@ class OptionController extends Controller
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="Option ID",
-     *         @OA\Schema(type="integer")
+     *         description="Option ID (UUID)",
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
@@ -132,7 +143,7 @@ class OptionController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Option updated successfully"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="id", type="string", format="uuid"),
      *                 @OA\Property(property="label", type="string"),
      *                 @OA\Property(property="text", type="string"),
      *                 @OA\Property(property="is_correct", type="boolean")
@@ -145,7 +156,7 @@ class OptionController extends Controller
      *     @OA\Response(response=404, description="Option not found")
      * )
      */
-    public function update(int $id, UpdateOptionRequest $request): JsonResponse
+    public function update(string $id, UpdateOptionRequest $request): JsonResponse
     {
         $option = Option::find($id);
 
@@ -188,8 +199,8 @@ class OptionController extends Controller
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="Option ID",
-     *         @OA\Schema(type="integer")
+     *         description="Option ID (UUID)",
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -205,7 +216,7 @@ class OptionController extends Controller
      *     @OA\Response(response=404, description="Option not found")
      * )
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $id): JsonResponse
     {
         $option = Option::find($id);
 

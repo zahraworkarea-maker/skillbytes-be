@@ -101,4 +101,14 @@ class User extends Authenticatable
     {
         return $this->isAdmin() || $this->isGuru();
     }
+
+    /**
+     * Check if user has any of the given roles
+     * @param string ...$roles
+     * @return bool
+     */
+    public function hasRole(...$roles): bool
+    {
+        return in_array($this->role->value, $roles);
+    }
 }

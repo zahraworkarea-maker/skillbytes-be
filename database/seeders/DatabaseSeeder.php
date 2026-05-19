@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             PblLevelSeeder::class,
             LessonSeeder::class,
             AssessmentSeeder::class,
+            AssessmentResultSeeder::class,
         ]);
     }
 }

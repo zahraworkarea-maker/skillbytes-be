@@ -22,16 +22,20 @@ class StoreQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'assessment_id' => 'required|exists:assessments,id',
-            'text' => 'required|string',
-            'explanation' => 'nullable|string',
+            'questions' => 'required|array|min:1|max:1000',
+            'questions.*.text' => 'required|string',
+            'questions.*.explanation' => 'nullable|string',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'assessment_id.exists' => 'Assessment tidak ditemukan',
+            'questions.required' => 'Questions array is required',
+            'questions.array' => 'Questions must be an array',
+            'questions.min' => 'At least 1 question is required',
+            'questions.max' => 'Maximum 1000 questions allowed per request',
+            'questions.*.text.required' => 'Question text is required for each question',
         ];
     }
 }

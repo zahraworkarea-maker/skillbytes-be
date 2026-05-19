@@ -17,6 +17,19 @@ class OptionService
     }
 
     /**
+     * Create multiple options in bulk
+     */
+    public function createBulkOptions(Question $question, array $options): array
+    {
+        $createdOptions = [];
+        foreach ($options as $optionData) {
+            $optionData['question_id'] = $question->id;
+            $createdOptions[] = Option::create($optionData);
+        }
+        return $createdOptions;
+    }
+
+    /**
      * Update option
      */
     public function updateOption(Option $option, array $data): Option

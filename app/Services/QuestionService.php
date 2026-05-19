@@ -18,6 +18,19 @@ class QuestionService
     }
 
     /**
+     * Create multiple questions in bulk
+     */
+    public function createBulkQuestions(Assessment $assessment, array $questions): array
+    {
+        $createdQuestions = [];
+        foreach ($questions as $questionData) {
+            $questionData['assessment_id'] = $assessment->id;
+            $createdQuestions[] = Question::create($questionData);
+        }
+        return $createdQuestions;
+    }
+
+    /**
      * Update question
      */
     public function updateQuestion(Question $question, array $data): Question
