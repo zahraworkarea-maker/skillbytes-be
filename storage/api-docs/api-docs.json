@@ -97,7 +97,7 @@
                     "Assessments"
                 ],
                 "summary": "Create new assessment",
-                "description": "Create a new assessment with title, description, and time limit. This endpoint is used to add a new assessment to the system for admin and guru roles.",
+                "description": "Create a new assessment with title, description, time limit, and assessment level. This endpoint is used to add a new assessment to the system for admin and guru roles.",
                 "operationId": "2cd1cb01988bbf877994e67e8a0bbebf",
                 "requestBody": {
                     "required": true,
@@ -106,6 +106,7 @@
                             "schema": {
                                 "required": [
                                     "slug",
+                                    "assessment_level_id",
                                     "title",
                                     "time_limit"
                                 ],
@@ -114,6 +115,11 @@
                                         "description": "Unique slug for the assessment",
                                         "type": "string",
                                         "example": "math-quiz-2024"
+                                    },
+                                    "assessment_level_id": {
+                                        "description": "Assessment level ID - the assessment will be grouped under this level",
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "title": {
                                         "description": "Assessment title",
@@ -213,7 +219,7 @@
                     "Assessments"
                 ],
                 "summary": "Update assessment",
-                "description": "Update an existing assessment including slug, title, description, and time limit. This endpoint modifies assessment details for admin and guru roles.",
+                "description": "Update an existing assessment including slug, title, description, time limit, and assessment level. This endpoint modifies assessment details for admin and guru roles.",
                 "operationId": "d64b50f60cc523e0001bc43d3f5b9613",
                 "parameters": [
                     {
@@ -236,6 +242,11 @@
                                         "description": "Updated slug",
                                         "type": "string",
                                         "example": "math-quiz-2024-updated",
+                                        "nullable": true
+                                    },
+                                    "assessment_level_id": {
+                                        "description": "Assessment level ID - the assessment will be grouped under this level",
+                                        "type": "integer",
                                         "nullable": true
                                     },
                                     "title": {
@@ -384,6 +395,438 @@
                     },
                     "404": {
                         "description": "Assessment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/assessment-levels": {
+            "get": {
+                "tags": [
+                    "Assessment Levels"
+                ],
+                "summary": "List assessment levels with assessments",
+                "description": "Retrieve all assessment levels with all assessments that belong to each level, ordered by level number",
+                "operationId": "a48f21c2a49658238a2446b5a05b717e",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved assessment levels with assessments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "level_number": {
+                                                        "description": "Numeric level identifier",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "description": {
+                                                        "description": "Description of assessment level",
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "assessments": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "slug": {
+                                                                    "type": "string"
+                                                                },
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "time_limit": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "total_questions": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Assessment Levels"
+                ],
+                "summary": "Create assessment level",
+                "description": "Create a new assessment level with unique level number",
+                "operationId": "fdf2a098dc67e4a3db5fc4a47d65422d",
+                "requestBody": {
+                    "description": "Assessment level data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "level_number"
+                                ],
+                                "properties": {
+                                    "level_number": {
+                                        "description": "Unique numeric level identifier (must be positive)",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "description": "Description of assessment level",
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Assessment level created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "level_number": {
+                                                    "type": "integer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed - level_number must be unique and positive"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/assessment-levels/{id}": {
+            "get": {
+                "tags": [
+                    "Assessment Levels"
+                ],
+                "summary": "Get assessment level with assessments",
+                "description": "Retrieve a specific assessment level with all assessments that belong to this level",
+                "operationId": "46eceee47f09bf2e6295e0852a47c24d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Assessment level ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved assessment level with assessments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "level_number": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "description": {
+                                                    "description": "Description of assessment level",
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "assessments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "title": {
+                                                                "type": "string"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            },
+                                                            "time_limit": {
+                                                                "type": "integer"
+                                                            },
+                                                            "total_questions": {
+                                                                "type": "integer"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Assessment level not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Assessment Levels"
+                ],
+                "summary": "Update assessment level",
+                "description": "Update an existing assessment level by ID",
+                "operationId": "f965c2dc6c53a252174eb58692ae69dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Assessment level ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Assessment level data to update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "level_number": {
+                                        "description": "Numeric level identifier (must be positive and unique)",
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "description": "Description of assessment level",
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assessment level updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "level_number": {
+                                                    "type": "integer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Assessment level not found"
+                    },
+                    "422": {
+                        "description": "Validation failed - level_number must be unique and positive"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Assessment Levels"
+                ],
+                "summary": "Delete assessment level",
+                "description": "Delete an assessment level by ID",
+                "operationId": "a126f3058192674b3de4fd996ac6921c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Assessment level ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assessment level deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Level deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Assessment level not found"
                     }
                 },
                 "security": [
@@ -4673,6 +5116,10 @@
         {
             "name": "Assessments",
             "description": "Assessments"
+        },
+        {
+            "name": "Assessment Levels",
+            "description": "Assessment Levels"
         },
         {
             "name": "Options",

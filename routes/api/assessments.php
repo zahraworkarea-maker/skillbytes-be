@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\OptionController;
 use App\Http\Controllers\Api\Admin\QuestionController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\User\AssessmentController;
+use App\Http\Controllers\Api\Admin\AssessmentLevelController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -44,6 +45,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/questions/{questionId}/options', 'store');
             Route::put('/options/{id}', 'update');
             Route::delete('/options/{id}', 'destroy');
+        });
+
+        // Assessment Levels CRUD
+        Route::controller(AssessmentLevelController::class)->group(function () {
+            Route::get('/assessment-levels', 'index');
+            Route::get('/assessment-levels/{id}', 'show');
+            Route::post('/assessment-levels', 'store');
+            Route::put('/assessment-levels/{id}', 'update');
+            Route::delete('/assessment-levels/{id}', 'destroy');
         });
     });
 });

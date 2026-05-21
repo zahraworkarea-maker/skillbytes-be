@@ -87,9 +87,10 @@ class AttemptService
         $totalQuestions = $attempt->assessment->questions()->count();
         $score = ($correctAnswers / $totalQuestions) * 100;
 
-        // Update attempt
+        // Update attempt (include computed level)
         $attempt->update([
             'score' => $score,
+            'level' => AssessmentAttempt::determineLevel($score),
             'status' => AssessmentAttemptStatus::COMPLETED,
             'completed_at' => now(),
         ]);

@@ -21,14 +21,15 @@ class AssessmentController extends Controller
      * @OA\Post(
      *     path="/assessments",
      *     summary="Create new assessment",
-     *     description="Create a new assessment with title, description, and time limit. This endpoint is used to add a new assessment to the system for admin and guru roles.",
+     *     description="Create a new assessment with title, description, time limit, and assessment level. This endpoint is used to add a new assessment to the system for admin and guru roles.",
      *     tags={"Assessments"},
      *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"slug","title","time_limit"},
+    *             required={"slug","assessment_level_id","title","time_limit"},
      *             @OA\Property(property="slug", type="string", example="math-quiz-2024", description="Unique slug for the assessment"),
+     *             @OA\Property(property="assessment_level_id", type="integer", example=1, description="Assessment level ID - the assessment will be grouped under this level"),
      *             @OA\Property(property="title", type="string", example="Math Quiz 2024", description="Assessment title"),
      *             @OA\Property(property="description", type="string", nullable=true, example="A comprehensive mathematics assessment", description="Assessment description"),
      *             @OA\Property(property="time_limit", type="integer", example=60, description="Time limit in minutes")
@@ -47,6 +48,7 @@ class AssessmentController extends Controller
      *                 @OA\Property(property="description", type="string", nullable=true),
      *                 @OA\Property(property="time_limit", type="integer"),
      *                 @OA\Property(property="total_questions", type="integer"),
+
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
      *             )
@@ -79,7 +81,7 @@ class AssessmentController extends Controller
      * @OA\Put(
      *     path="/assessments/{id}",
      *     summary="Update assessment",
-     *     description="Update an existing assessment including slug, title, description, and time limit. This endpoint modifies assessment details for admin and guru roles.",
+     *     description="Update an existing assessment including slug, title, description, time limit, and assessment level. This endpoint modifies assessment details for admin and guru roles.",
      *     tags={"Assessments"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
@@ -92,10 +94,11 @@ class AssessmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="slug", type="string", nullable=true, example="math-quiz-2024-updated", description="Updated slug"),
-     *             @OA\Property(property="title", type="string", nullable=true, example="Math Quiz 2024 Updated", description="Updated title"),
-     *             @OA\Property(property="description", type="string", nullable=true, example="Updated description", description="Updated description"),
-     *             @OA\Property(property="time_limit", type="integer", nullable=true, example=90, description="Updated time limit in minutes")
+    *             @OA\Property(property="slug", type="string", nullable=true, example="math-quiz-2024-updated", description="Updated slug"),
+    *             @OA\Property(property="assessment_level_id", type="integer", nullable=true, description="Assessment level ID - the assessment will be grouped under this level"),
+    *             @OA\Property(property="title", type="string", nullable=true, example="Math Quiz 2024 Updated", description="Updated title"),
+    *             @OA\Property(property="description", type="string", nullable=true, example="Updated description", description="Updated description"),
+    *             @OA\Property(property="time_limit", type="integer", nullable=true, example=90, description="Updated time limit in minutes")
      *         )
      *     ),
      *     @OA\Response(

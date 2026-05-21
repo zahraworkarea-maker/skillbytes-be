@@ -17,6 +17,7 @@ class AssessmentAttempt extends Model
         'assessment_id',
         'score',
         'status',
+        'level',
         'started_at',
         'completed_at',
     ];
@@ -24,6 +25,7 @@ class AssessmentAttempt extends Model
     protected $casts = [
         'score' => 'decimal:2',
         'status' => AssessmentAttemptStatus::class,
+        'level' => 'string',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
@@ -73,5 +75,25 @@ class AssessmentAttempt extends Model
     public function getCorrectAnswersCount(): int
     {
         return $this->answers()->where('is_correct', true)->count();
+    }
+
+    /**
+     * Determine level string based on numeric score using fixed thresholds.
+     *
+     * - 0-40 => Novice
+     * - 41-70 => Intermediate
+     * - 71-100 => Advanced
+     */
+    public static function determineLevel(float $score): string
+    {
+        if ($score >= 71) {
+            return 'Advanced';
+        }
+
+        if ($score >= 41) {
+            return 'Intermediate';
+        }
+
+        return 'Novice';
     }
 }

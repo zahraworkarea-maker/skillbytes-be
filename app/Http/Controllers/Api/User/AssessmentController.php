@@ -77,18 +77,18 @@ class AssessmentController extends Controller
      *         required=true,
      *         description="Assessment slug"
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Assessment details with questions",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="string"),
-     *                 @OA\Property(property="title", type="string"),
-     *                 @OA\Property(property="description", type="string"),
-     *                 @OA\Property(property="total_questions", type="integer"),
-     *                 @OA\Property(property="time_limit", type="integer"),
-     *                 @OA\Property(property="questions", type="array", @OA\Items(
+    *         @OA\Response(
+    *         response=200,
+    *         description="Assessment details with questions",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="success", type="boolean", example=true),
+    *             @OA\Property(property="data", type="object",
+    *                 @OA\Property(property="id", type="string"),
+    *                 @OA\Property(property="title", type="string"),
+    *                 @OA\Property(property="description", type="string"),
+    *                 @OA\Property(property="total_questions", type="integer"),
+    *                 @OA\Property(property="time_limit", type="integer"),
+    *                 @OA\Property(property="questions", type="array", @OA\Items(
      *                     @OA\Property(property="id", type="string"),
      *                     @OA\Property(property="question", type="string"),
      *                     @OA\Property(property="options", type="array", @OA\Items(

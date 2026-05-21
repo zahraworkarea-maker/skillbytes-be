@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserProgressController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,9 @@ Route::post('/login', [UserController::class, 'login'])->name('users.login');
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
+    // Get user's progress
+    Route::get('/my-progress', [UserProgressController::class, 'myProgress'])->name('users.progress');
+
     // List users with pagination, search, and sort
     Route::get('/', [UserController::class, 'index'])->name('users.index');
 

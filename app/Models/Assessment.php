@@ -15,7 +15,18 @@ class Assessment extends Model
         'title',
         'description',
         'time_limit',
+        'level',
+        'assessment_level_id',
     ];
+
+    protected $casts = [
+        'level' => 'integer',
+    ];
+
+    public function assessmentLevel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AssessmentLevel::class, 'assessment_level_id');
+    }
 
     // Relationships
     public function questions(): HasMany
