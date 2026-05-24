@@ -43,7 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Case Submissions - File upload
     Route::post('/pbl-submissions', [CaseSubmissionController::class, 'store']);
     Route::get('/pbl-submissions', [CaseSubmissionController::class, 'getUserSubmissions']);
-    Route::get('/pbl-submissions/{caseSubmission}', [CaseSubmissionController::class, 'show']);
+    Route::get('/pbl-submissions/debug/list', [CaseSubmissionController::class, 'debugList']);
+    Route::get('/pbl-submissions/me', [CaseSubmissionController::class, 'mySubmissions']);
+    Route::put('/pbl-submissions/{caseSubmission}/grade', [CaseSubmissionController::class, 'grade']);
 
     // Image Upload - Admin/Guru only
     Route::post('/upload-image', [ImageUploadController::class, 'upload']);

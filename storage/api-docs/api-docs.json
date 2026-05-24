@@ -2807,6 +2807,9 @@
                                                 "title": {
                                                     "type": "string"
                                                 },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
                                                 "description": {
                                                     "type": "string"
                                                 },
@@ -3116,17 +3119,133 @@
         "/pbl-submissions": {
             "get": {
                 "tags": [
-                    "User - Case Submissions"
+                    "PBL Submissions - Admin/Guru"
                 ],
-                "summary": "Get user's submissions",
-                "description": "Retrieve all submissions made by the current user",
-                "operationId": "getUserSubmissions",
+                "summary": "Get all student submissions (admin/guru only)",
+                "description": "Retrieve all PBL case submissions from all students. Only administrators and teachers (guru) can access this endpoint. Results are paginated (15 items per page) and sorted by submission date (newest first).",
+                "operationId": "getAllSubmissions",
                 "responses": {
                     "200": {
-                        "description": "List of user's submissions"
+                        "description": "List of all submissions successfully retrieved (paginated, 15 per page, sorted by submitted_at DESC)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "case_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "user_id": {
+                                                        "description": "Student ID",
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "answer": {
+                                                        "type": "string",
+                                                        "example": "My detailed answer...",
+                                                        "nullable": true
+                                                    },
+                                                    "submission_file": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "nullable": true
+                                                    },
+                                                    "submission_file_path": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "example": 85.5,
+                                                        "nullable": true
+                                                    },
+                                                    "feedback": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "submitted_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "format": "uri"
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "format": "uri"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only admin and guru can view all submissions"
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated - no valid bearer token provided"
                     }
                 },
                 "security": [
@@ -3137,10 +3256,10 @@
             },
             "post": {
                 "tags": [
-                    "PBL Submissions"
+                    "PBL Submissions - Student"
                 ],
                 "summary": "Submit answer for a PBL case",
-                "description": "Submit an answer to a PBL case with optional text and/or file upload. Can only submit once per case. Answer data includes user_id for scoring purposes.",
+                "description": "Submit an answer to a PBL case with optional text and/or file upload. Students can only submit once per case. Both text answer and file submission are optional but at least one must be provided.",
                 "operationId": "submitCaseAnswer",
                 "requestBody": {
                     "description": "Case submission with answer text and/or file",
@@ -3153,15 +3272,17 @@
                                 ],
                                 "properties": {
                                     "case_id": {
+                                        "description": "The PBL case ID to submit answer for",
                                         "type": "integer",
                                         "example": 1
                                     },
                                     "answer": {
-                                        "description": "Answer text (at least 10 characters, optional)",
-                                        "type": "string"
+                                        "description": "Answer text (minimum 10 characters, optional)",
+                                        "type": "string",
+                                        "example": "This is my detailed answer to the case..."
                                     },
                                     "submission_file": {
-                                        "description": "Submission file (any format accepted)",
+                                        "description": "Submission file (any format accepted - PDF, DOC, images, etc.)",
                                         "type": "string",
                                         "format": "binary"
                                     }
@@ -3172,16 +3293,60 @@
                     }
                 },
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Answer submitted successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "Answer submitted successfully"
                                         },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "case_id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "answer": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "submission_file": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "submission_file_path": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "nullable": true
+                                                },
+                                                "feedback": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -3191,13 +3356,13 @@
                         }
                     },
                     "400": {
-                        "description": "Already submitted or case not available"
+                        "description": "Validation failed - already submitted or case not available"
                     },
                     "422": {
                         "description": "Validation error"
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
                     }
                 },
                 "security": [
@@ -3207,14 +3372,83 @@
                 ]
             }
         },
-        "/pbl-submissions/{id}": {
+        "/pbl-submissions/me": {
             "get": {
                 "tags": [
-                    "User - Case Submissions"
+                    "PBL Submissions - Student"
                 ],
-                "summary": "Get submission details",
-                "description": "Get details of a specific submission",
-                "operationId": "getSubmission",
+                "summary": "Get my submissions",
+                "description": "Retrieve all PBL case submissions belonging to the currently authenticated user.",
+                "operationId": "getMySubmissions",
+                "responses": {
+                    "200": {
+                        "description": "Submissions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "case_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "answer": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "submission_file": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "submitted_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "nullable": true
+                                                    },
+                                                    "feedback": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pbl-submissions/{id}/grade": {
+            "put": {
+                "tags": [
+                    "PBL Submissions - Grading"
+                ],
+                "summary": "Grade a student's PBL submission",
+                "description": "Assign a score (0-100) and provide feedback to a student's PBL case submission. Only administrators and teachers (guru) can perform this action.",
+                "operationId": "gradeSubmission",
                 "parameters": [
                     {
                         "name": "id",
@@ -3222,19 +3456,216 @@
                         "description": "Submission ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
+                "requestBody": {
+                    "description": "Grading data with score and feedback",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "score",
+                                    "feedback"
+                                ],
+                                "properties": {
+                                    "score": {
+                                        "description": "Numerical score from 0 to 100 (with decimals supported)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 85.5
+                                    },
+                                    "feedback": {
+                                        "description": "Feedback message for the student (minimum 5 characters)",
+                                        "type": "string",
+                                        "example": "Good analysis of the case. Consider discussing alternative approaches."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Submission details"
+                        "description": "Submission graded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Submission graded successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "case_id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "answer": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "submission_file": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "nullable": true
+                                                },
+                                                "submission_file_path": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "nullable": true
+                                                },
+                                                "feedback": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Submission not found"
                     },
+                    "403": {
+                        "description": "Forbidden - only administrators and teachers can grade submissions"
+                    },
+                    "422": {
+                        "description": "Validation error - invalid score or feedback format"
+                    },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pbl-submissions/debug/list": {
+            "get": {
+                "tags": [
+                    "PBL Submissions - Debug"
+                ],
+                "summary": "[DEBUG] Get all my submissions without pagination",
+                "description": "DEBUG ENDPOINT ONLY - Retrieve raw unfiltered list of all submissions for the current user without pagination. Useful for debugging data availability issues. Shows submission count stats.",
+                "operationId": "debugSubmissionsList",
+                "responses": {
+                    "200": {
+                        "description": "All submissions for current user (unfiltered, no pagination)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Debug Info"
+                                        },
+                                        "user_id": {
+                                            "description": "Current authenticated user ID",
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "user_name": {
+                                            "description": "Current authenticated user name",
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "total_submissions_in_db": {
+                                            "description": "Total submissions across all users",
+                                            "type": "integer",
+                                            "example": 42
+                                        },
+                                        "total_user_submissions": {
+                                            "description": "Total submissions for current user",
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "all_submissions": {
+                                            "description": "All submissions belonging to the current user (unfiltered)",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "case_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "answer": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "submission_file": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "nullable": true
+                                                    },
+                                                    "feedback": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "submitted_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 },
                 "security": [
@@ -5079,6 +5510,79 @@
         }
     },
     "components": {
+        "schemas": {
+            "CaseSubmission": {
+                "description": "PBL Case Submission resource",
+                "properties": {
+                    "id": {
+                        "description": "Submission ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "case_id": {
+                        "description": "PBL Case ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "description": "Student User ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "answer": {
+                        "description": "Student's text answer",
+                        "type": "string",
+                        "example": "This is my answer to the case...",
+                        "nullable": true
+                    },
+                    "submission_file": {
+                        "description": "URL to the submission file",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://localhost:8000/storage/submissions/pbl/file.pdf",
+                        "nullable": true
+                    },
+                    "submission_file_path": {
+                        "description": "Relative path to submission file",
+                        "type": "string",
+                        "example": "submissions/pbl/1716562200_1_abc123.pdf",
+                        "nullable": true
+                    },
+                    "submitted_at": {
+                        "description": "Submission timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-05-24T10:30:00Z"
+                    },
+                    "score": {
+                        "description": "Score given by teacher (0-100)",
+                        "type": "number",
+                        "format": "float",
+                        "example": 85.5,
+                        "nullable": true
+                    },
+                    "feedback": {
+                        "description": "Feedback from teacher",
+                        "type": "string",
+                        "example": "Good work, but needs more detail",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "Record creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-05-24T10:30:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Record last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-05-24T11:45:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
@@ -5110,8 +5614,16 @@
             "description": "Manage PBL levels (GET for all users, CRUD for Admin only)"
         },
         {
-            "name": "PBL Submissions",
-            "description": "PBL case submissions (file upload)"
+            "name": "PBL Submissions - Student",
+            "description": "Student endpoints for submitting and viewing personal submissions"
+        },
+        {
+            "name": "PBL Submissions - Admin/Guru",
+            "description": "Admin/Guru endpoints for viewing all student submissions and grading"
+        },
+        {
+            "name": "PBL Submissions - Debug",
+            "description": "Debug endpoints for troubleshooting submission data issues"
         },
         {
             "name": "Assessments",
@@ -5138,8 +5650,8 @@
             "description": "Assessment Attempts"
         },
         {
-            "name": "User - Case Submissions",
-            "description": "User - Case Submissions"
+            "name": "PBL Submissions - Grading",
+            "description": "PBL Submissions - Grading"
         },
         {
             "name": "Authentication",

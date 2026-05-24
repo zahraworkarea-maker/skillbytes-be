@@ -22,7 +22,7 @@ class UpdateAssessmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'slug' => 'sometimes|required|string|unique:assessments,slug,' . $this->route('assessment'),
+            'slug' => 'sometimes|required|string|unique:assessments,slug,' . $this->route('id'),
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'time_limit' => 'sometimes|required|integer|min:1',

@@ -18,6 +18,7 @@ class AssessmentDetailResource extends JsonResource
         return [
             'id' => (string) $this->id,
             'title' => $this->title,
+            'slug' => $this->slug,
             'description' => $this->description,
             'total_questions' => $this->questions()->count(),
             'time_limit' => $this->time_limit,

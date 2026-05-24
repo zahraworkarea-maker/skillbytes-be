@@ -85,6 +85,7 @@ class AssessmentController extends Controller
     *             @OA\Property(property="data", type="object",
     *                 @OA\Property(property="id", type="string"),
     *                 @OA\Property(property="title", type="string"),
+    *                 @OA\Property(property="slug", type="string"),
     *                 @OA\Property(property="description", type="string"),
     *                 @OA\Property(property="total_questions", type="integer"),
     *                 @OA\Property(property="time_limit", type="integer"),
