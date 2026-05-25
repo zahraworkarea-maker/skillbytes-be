@@ -20,12 +20,16 @@ class Lesson extends Model
         'title',
         'description',
         'duration',
-        'pdf_url',
+        'file_url',
+        'resume',
     ];
 
-    protected $casts = [
-        'completed' => 'boolean',
-    ];
+    protected $appends = ['completed'];
+
+    /**
+     * Store virtual attributes that should not be saved to database
+     */
+    protected $virtualAttributes = [];
 
     protected static function booted(): void
     {
@@ -53,5 +57,28 @@ class Lesson extends Model
         return $this->belongsToMany(User::class, 'user_lessons')
             ->withPivot(['completed', 'completed_at'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get the lesson's completed status.
+     * This is a virtual attribute that doesn't persist to the database.
+     */
+    public function getCompletedAttribute(): bool
+    {
+        return $this->virtualAttributes['completed'] ?? false;
+    }
+
+    /**
+     * Override setAttribute to prevent completed from being saved to database
+     */
+    public function setAttribute($key, $value)
+    {
+        // Store completed in virtual attributes instead of model attributes
+        if ($key === 'completed') {
+            $this->virtualAttributes['completed'] = $value;
+            return $this;
+        }
+
+        return parent::setAttribute($key, $value);
     }
 }

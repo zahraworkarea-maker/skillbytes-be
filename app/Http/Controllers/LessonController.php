@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GetLessonsByLevelRequest;
 use App\Http\Requests\StoreLessonRequest;
 use App\Http\Requests\UpdateLessonRequest;
+use App\Http\Requests\UpdateLessonResumeRequest;
+use App\Http\Requests\UploadFileRequest;
 use App\Http\Resources\LessonResource;
 use App\Services\LessonService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LessonController extends Controller
 {
@@ -314,5 +317,171 @@ class LessonController extends Controller
         $this->lessonService->deleteLessonBySlug($slug);
 
         return $this->successResponse(null, 'Lesson deleted successfully');
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/lessons/{slug}/resume",
+     *     operationId="updateLessonResume",
+     *     summary="Update or add resume for a lesson",
+     *     description="Update or add resume text for a lesson. Resume must contain at least 300 words. Only accessible to admin and guru roles.",
+     *     tags={"Lessons"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         required=true,
+     *         description="Lesson slug"
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Resume text",
+     *         @OA\JsonContent(
+     *             required={"resume"},
+     *             @OA\Property(
+     *                 property="resume",
+     *                 type="string",
+     *                 description="Resume text (minimum 300 words)",
+     *                 example="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+     *             ),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Resume updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Resume updated successfully"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="lesson_id", type="integer"),
+     *                 @OA\Property(property="slug", type="string"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="resume", type="string"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Validation error - Resume must be at least 300 words"),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Lesson not found")
+     * )
+     */
+    public function updateResume(UpdateLessonResumeRequest $request, string $slug): JsonResponse
+    {
+        try {
+            $lesson = $this->lessonService->getLessonBySlug($slug, $request->user());
+            
+            if (!$lesson) {
+                return $this->notFoundResponse('Lesson not found');
+            }
+
+            // Update lesson resume
+            $lesson->update([
+                'resume' => $request->validated('resume')
+            ]);
+
+            return $this->successResponse([
+                'lesson_id' => $lesson->id,
+                'slug' => $lesson->slug,
+                'title' => $lesson->title,
+                'resume' => $lesson->resume,
+                'updated_at' => $lesson->updated_at,
+            ], 'Resume updated successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to update resume: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/lessons/{slug}/upload-file",
+     *     operationId="uploadLessonFile",
+     *     summary="Upload or update file for a lesson",
+     *     description="Upload or update a file for a lesson. Accepts any file format (PDF, DOC, DOCX, PPT, XLS, ZIP, etc). Max file size: 100MB. Only accessible to admin and guru roles.",
+     *     tags={"Lessons"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         required=true,
+     *         description="Lesson slug"
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="File to upload",
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file"},
+     *                 @OA\Property(
+     *                     property="file",
+     *                     description="File to upload (any format - PDF, DOC, DOCX, PPT, XLS, ZIP, etc)",
+     *                     type="string",
+     *                     format="binary"
+     *                 ),
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="File uploaded successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="File uploaded successfully"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="lesson_id", type="integer"),
+     *                 @OA\Property(property="slug", type="string"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="file_url", type="string", example="http://localhost:8000/file/filename.pdf"),
+     *                 @OA\Property(property="file_size", type="integer", example=1048576),
+     *                 @OA\Property(property="file_type", type="string", example="pdf"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Validation error - File required or too large"),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Lesson not found")
+     * )
+     */
+    public function uploadFile(UploadFileRequest $request, string $slug): JsonResponse
+    {
+        try {
+            $lesson = $this->lessonService->getLessonBySlug($slug, $request->user());
+            
+            if (!$lesson) {
+                return $this->notFoundResponse('Lesson not found');
+            }
+
+            $file = $request->file('file');
+            
+            // Generate unique filename with original extension
+            $filename = time() . '_' . \Str::random(8) . '.' . $file->getClientOriginalExtension();
+            
+            // Store file
+            $path = Storage::disk('public')
+                ->putFileAs('lessons', $file, $filename);
+
+            // Update lesson file_url
+            $lesson->update([
+                'file_url' => '/storage/' . $path
+            ]);
+
+            return $this->successResponse([
+                'lesson_id' => $lesson->id,
+                'slug' => $lesson->slug,
+                'title' => $lesson->title,
+                'file_url' => $lesson->file_url,
+                'file_size' => $file->getSize(),
+                'file_type' => $file->getClientOriginalExtension(),
+                'updated_at' => $lesson->updated_at,
+            ], 'File uploaded successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to upload file: ' . $e->getMessage(), 500);
+        }
     }
 }

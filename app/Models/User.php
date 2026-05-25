@@ -81,6 +81,11 @@ class User extends Authenticatable
         return $this->hasMany(AssessmentAttempt::class);
     }
 
+    public function resumes(): HasMany
+    {
+        return $this->hasMany(UserResume::class);
+    }
+
     // Helper methods for role checking
     public function isAdmin(): bool
     {

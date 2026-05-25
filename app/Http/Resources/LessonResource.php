@@ -21,7 +21,8 @@ class LessonResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'duration' => $this->duration,
-            'pdf_url' => $this->generatePdfUrl($this->pdf_url),
+            'file_url' => $this->generateFileUrl($this->file_url),
+            'resume' => $this->resume,
             'completed' => (bool) ($this->completed ?? false),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -29,23 +30,23 @@ class LessonResource extends JsonResource
     }
 
     /**
-     * Generate URL untuk akses PDF via route /pdf/{file}
+     * Generate path untuk akses file (hanya path tanpa /storage)
      */
-    private function generatePdfUrl(?string $pdfUrl): ?string
+    private function generateFileUrl(?string $fileUrl): ?string
     {
-        if (empty($pdfUrl)) {
+        if (empty($fileUrl)) {
             return null;
         }
 
-        // ✅ Jika sudah full URL (misalnya dari CDN / external)
-        if (filter_var($pdfUrl, FILTER_VALIDATE_URL)) {
-            return $pdfUrl;
+        // ✅ Jika sudah full URL, extract path saja
+        if (filter_var($fileUrl, FILTER_VALIDATE_URL)) {
+            $parsedUrl = parse_url($fileUrl);
+            $path = $parsedUrl['path'] ?? $fileUrl;
+        } else {
+            $path = $fileUrl;
         }
 
-        // Ambil nama file saja (hindari path traversal)
-        $filename = basename($pdfUrl);
-
-        // 🔥 Gunakan route Laravel untuk serve PDF
-        return url('/pdf/' . $filename);
+        // Hapus /storage/ dari path
+        return str_replace('/storage/', '/', $path);
     }
 }

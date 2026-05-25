@@ -1199,6 +1199,94 @@
                 ]
             }
         },
+        "/upload-file": {
+            "post": {
+                "tags": [
+                    "File Management"
+                ],
+                "summary": "Upload a file (Admin/Guru only)",
+                "description": "Upload any file format for lessons/materi (resume, document, etc.). Only accessible to Admin and Guru roles. Max size: 100MB",
+                "operationId": "uploadFile",
+                "requestBody": {
+                    "description": "File to upload",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "File to upload (any format allowed)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "File uploaded successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string",
+                                                    "example": "/storage/files/filename.pdf"
+                                                },
+                                                "filename": {
+                                                    "type": "string",
+                                                    "example": "filename.pdf"
+                                                },
+                                                "file_type": {
+                                                    "type": "string",
+                                                    "example": "pdf"
+                                                },
+                                                "file_size": {
+                                                    "type": "integer",
+                                                    "example": 1024
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Only Admin and Guru can upload files"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/upload-image": {
             "post": {
                 "tags": [
@@ -4440,6 +4528,213 @@
                 ]
             }
         },
+        "/lessons/{slug}/resume": {
+            "put": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Update or add resume for a lesson",
+                "description": "Update or add resume text for a lesson. Resume must contain at least 300 words. Only accessible to admin and guru roles.",
+                "operationId": "updateLessonResume",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Lesson slug",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "description": "Resume text",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resume"
+                                ],
+                                "properties": {
+                                    "resume": {
+                                        "description": "Resume text (minimum 300 words)",
+                                        "type": "string",
+                                        "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Resume updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resume updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "lesson_id": {
+                                                    "type": "integer"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "resume": {
+                                                    "type": "string"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error - Resume must be at least 300 words"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/lessons/{slug}/upload-file": {
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Upload or update file for a lesson",
+                "description": "Upload or update a file for a lesson. Accepts any file format (PDF, DOC, DOCX, PPT, XLS, ZIP, etc). Max file size: 100MB. Only accessible to admin and guru roles.",
+                "operationId": "uploadLessonFile",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Lesson slug",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "description": "File to upload",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "File to upload (any format - PDF, DOC, DOCX, PPT, XLS, ZIP, etc)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "File uploaded successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "lesson_id": {
+                                                    "type": "integer"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "file_url": {
+                                                    "type": "string",
+                                                    "example": "http://localhost:8000/file/filename.pdf"
+                                                },
+                                                "file_size": {
+                                                    "type": "integer",
+                                                    "example": 1048576
+                                                },
+                                                "file_type": {
+                                                    "type": "string",
+                                                    "example": "pdf"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error - File required or too large"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/levels": {
             "get": {
                 "tags": [
@@ -5507,6 +5802,367 @@
                     }
                 ]
             }
+        },
+        "/user/resumes": {
+            "get": {
+                "tags": [
+                    "User Resumes"
+                ],
+                "summary": "Get all user resumes",
+                "description": "Retrieve all resumes for the authenticated user. Can filter by lesson_id.",
+                "operationId": "4d38848983b7ccb2a3ff3f2c25b4546f",
+                "parameters": [
+                    {
+                        "name": "lesson_id",
+                        "in": "query",
+                        "description": "Filter resumes by lesson ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User resumes retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resumes retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "lesson_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "content": {
+                                                        "type": "string"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "User Resumes"
+                ],
+                "summary": "Create new resume for a lesson",
+                "description": "Create a new resume for the authenticated user for a specific lesson.",
+                "operationId": "f723b4e8b8232341558074a0377b8faf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "lesson_id",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "lesson_id": {
+                                        "description": "Lesson ID this resume is for",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "content": {
+                                        "description": "Resume content",
+                                        "type": "string",
+                                        "example": "This lesson covered data structures including arrays, linked lists..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Resume created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resume created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                },
+                                                "lesson_id": {
+                                                    "type": "integer"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user/resumes/{id}": {
+            "get": {
+                "tags": [
+                    "User Resumes"
+                ],
+                "summary": "Get single resume",
+                "description": "Retrieve a specific resume by ID for the authenticated user.",
+                "operationId": "590dd363ac24fb0476b0b8bda1c093b2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Resume ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resume retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resume retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Resume belongs to another user"
+                    },
+                    "404": {
+                        "description": "Resume not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "User Resumes"
+                ],
+                "summary": "Update resume",
+                "description": "Update the content of an existing resume for the authenticated user.",
+                "operationId": "fafc4853d0b550cfcb5496a5f0b1e617",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Resume ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "description": "Resume content",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Resume updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resume updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resume not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "User Resumes"
+                ],
+                "summary": "Delete resume",
+                "description": "Delete a resume for the authenticated user.",
+                "operationId": "1d83627597b462bc8ed6a139d8eeddae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Resume ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resume deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resume deleted successfully"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resume not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -5602,6 +6258,10 @@
             "description": "Manage section items (Admin/Guru only)"
         },
         {
+            "name": "File Management",
+            "description": "File management (Admin/Guru only)"
+        },
+        {
             "name": "Media",
             "description": "Media management (Admin/Guru only)"
         },
@@ -5672,6 +6332,10 @@
         {
             "name": "User Progress",
             "description": "User Progress"
+        },
+        {
+            "name": "User Resumes",
+            "description": "User Resumes"
         }
     ]
 }
