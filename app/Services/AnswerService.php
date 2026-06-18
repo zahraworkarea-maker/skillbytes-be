@@ -7,9 +7,16 @@ use App\Models\AttemptAnswer;
 use App\Models\Option;
 use App\Models\Question;
 use Illuminate\Database\Eloquent\Collection;
+use App\Services\DktEngineService;
 
 class AnswerService
 {
+    private DktEngineService $dktEngine;
+
+    public function __construct(DktEngineService $dktEngine)
+    {
+        $this->dktEngine = $dktEngine;
+    }
     /**
      * Submit answer for a question
      *
@@ -58,6 +65,14 @@ class AnswerService
             throw new \Exception('Option does not belong to this question');
         }
 
+        // Trigger DKT update
+        $this->dktEngine->updateMastery(
+            $attempt->user_id,
+            $question,
+            $option->is_correct,
+            $attempt->id
+        );
+
         // Create answer record
         return AttemptAnswer::create([
             'attempt_id' => $attempt->id,
@@ -93,17 +108,37 @@ class AnswerService
         $results = [];
         $failedCount = 0;
 
+        // Extract all question IDs and option IDs
+        $questionIds = array_column($answers, 'question_id');
+        $optionIds = array_column($answers, 'selected_option_id');
+
+        // Fetch all existing answers for this attempt and these questions
+        $existingAnswers = AttemptAnswer::where('attempt_id', $attempt->id)
+            ->whereIn('question_id', $questionIds)
+            ->pluck('id', 'question_id')
+            ->toArray();
+
+        // Fetch all valid questions for this assessment
+        $validQuestions = Question::whereIn('id', $questionIds)
+            ->where('assessment_id', $attempt->assessment_id)
+            ->pluck('id')
+            ->toArray();
+
+        // Fetch all valid options
+        $validOptions = Option::whereIn('id', $optionIds)
+            ->whereIn('question_id', $questionIds)
+            ->get(['id', 'question_id', 'is_correct'])
+            ->keyBy('id');
+
+        $answersToInsert = [];
+
         foreach ($answers as $answerData) {
             $questionId = $answerData['question_id'];
             $selectedOptionId = $answerData['selected_option_id'];
 
             try {
-                // Check if question already answered
-                $existingAnswer = AttemptAnswer::where('attempt_id', $attempt->id)
-                    ->where('question_id', $questionId)
-                    ->first();
-
-                if ($existingAnswer) {
+                // Check if already answered
+                if (isset($existingAnswers[$questionId])) {
                     $results[] = [
                         'question_id' => $questionId,
                         'success' => false,
@@ -115,12 +150,8 @@ class AnswerService
                     continue;
                 }
 
-                // Validate question belongs to assessment
-                $question = Question::where('id', $questionId)
-                    ->where('assessment_id', $attempt->assessment_id)
-                    ->first();
-
-                if (!$question) {
+                // Check if question is valid for this assessment
+                if (!in_array($questionId, $validQuestions)) {
                     $results[] = [
                         'question_id' => $questionId,
                         'success' => false,
@@ -132,12 +163,9 @@ class AnswerService
                     continue;
                 }
 
-                // Validate option belongs to question
-                $option = Option::where('id', $selectedOptionId)
-                    ->where('question_id', $questionId)
-                    ->first();
-
-                if (!$option) {
+                // Check if option is valid for this question
+                $option = $validOptions->get($selectedOptionId);
+                if (!$option || $option->question_id != $questionId) {
                     $results[] = [
                         'question_id' => $questionId,
                         'success' => false,
@@ -149,21 +177,16 @@ class AnswerService
                     continue;
                 }
 
-                // Create answer record
-                $answer = AttemptAnswer::create([
+                $answersToInsert[] = [
+                    'id' => (string) \Illuminate\Support\Str::uuid(),
                     'attempt_id' => $attempt->id,
                     'question_id' => $questionId,
                     'selected_option_id' => $selectedOptionId,
                     'is_correct' => $option->is_correct,
-                ]);
-
-                $results[] = [
-                    'question_id' => $questionId,
-                    'success' => true,
-                    'message' => 'Answer submitted',
-                    'answer_id' => $answer->id,
-                    'is_correct' => $answer->is_correct,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
+
             } catch (\Exception $e) {
                 $results[] = [
                     'question_id' => $questionId,
@@ -173,6 +196,35 @@ class AnswerService
                     'is_correct' => null,
                 ];
                 $failedCount++;
+            }
+        }
+
+        // Bulk insert valid answers
+        if (count($answersToInsert) > 0) {
+            AttemptAnswer::insert($answersToInsert);
+
+            // Fetch questions for DKT trigger
+            $insertedQuestionIds = array_column($answersToInsert, 'question_id');
+            $questionsForDkt = Question::whereIn('id', $insertedQuestionIds)->get()->keyBy('id');
+
+            // Populate successful results and trigger DKT
+            foreach ($answersToInsert as $inserted) {
+                if (isset($questionsForDkt[$inserted['question_id']])) {
+                    $this->dktEngine->updateMastery(
+                        $attempt->user_id,
+                        $questionsForDkt[$inserted['question_id']],
+                        $inserted['is_correct'],
+                        $attempt->id
+                    );
+                }
+
+                $results[] = [
+                    'question_id' => $inserted['question_id'],
+                    'success' => true,
+                    'message' => 'Answer submitted',
+                    'answer_id' => $inserted['id'],
+                    'is_correct' => $inserted['is_correct'],
+                ];
             }
         }
 

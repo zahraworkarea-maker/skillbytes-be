@@ -49,11 +49,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Assessment Levels CRUD
         Route::controller(AssessmentLevelController::class)->group(function () {
-            Route::get('/assessment-levels', 'index');
-            Route::get('/assessment-levels/{id}', 'show');
             Route::post('/assessment-levels', 'store');
             Route::put('/assessment-levels/{id}', 'update');
             Route::delete('/assessment-levels/{id}', 'destroy');
         });
+    });
+
+    // Assessment Levels (Read-only for all authenticated users)
+    Route::controller(AssessmentLevelController::class)->group(function () {
+        Route::get('/assessment-levels', 'index');
+        Route::get('/assessment-levels/{id}', 'show');
     });
 });

@@ -16,6 +16,15 @@ class Question extends Model
         'text',
         'explanation',
         'image_path',
+        'difficulty_level',
+        'discrimination',
+        'guess_probability',
+    ];
+
+    protected $casts = [
+        'difficulty_level' => 'decimal:4',
+        'discrimination' => 'decimal:4',
+        'guess_probability' => 'decimal:4',
     ];
 
     // Relationships
@@ -32,5 +41,10 @@ class Question extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(AttemptAnswer::class);
+    }
+
+    public function skills(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Skill::class)->withTimestamps();
     }
 }

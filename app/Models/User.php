@@ -86,6 +86,16 @@ class User extends Authenticatable
         return $this->hasMany(UserResume::class);
     }
 
+    public function skillMasteries(): HasMany
+    {
+        return $this->hasMany(UserSkillMastery::class);
+    }
+
+    public function dktTrajectories(): HasMany
+    {
+        return $this->hasMany(DktTrajectory::class);
+    }
+
     // Helper methods for role checking
     public function isAdmin(): bool
     {
