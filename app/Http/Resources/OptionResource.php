@@ -14,10 +14,17 @@ class OptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => (string) $this->id,
             'label' => $this->label,
             'text' => $this->text,
         ];
+
+        // Include is_correct only for admin and guru
+        if ($request->user() && $request->user()->isAdminOrGuru()) {
+            $data['is_correct'] = $this->is_correct;
+        }
+
+        return $data;
     }
 }
