@@ -22,7 +22,7 @@ class OptionResource extends JsonResource
 
         // Include is_correct only for admin and guru
         if ($request->user() && $request->user()->isAdminOrGuru()) {
-            $data['is_correct'] = $this->is_correct;
+            $data['is_correct'] = (bool) $this->is_correct;
         }
 
         return $data;
