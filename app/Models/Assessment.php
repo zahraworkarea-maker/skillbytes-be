@@ -31,7 +31,7 @@ class Assessment extends Model
     // Relationships
     public function questions(): HasMany
     {
-        return $this->hasMany(Question::class);
+        return $this->hasMany(Question::class)->orderBy('created_at', 'asc');
     }
 
     public function attempts(): HasMany
