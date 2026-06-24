@@ -19,3 +19,5 @@ require __DIR__ . '/api/users.php';
 require __DIR__ . '/api/pbl.php';
 require __DIR__ . '/api/assessments.php';
 require __DIR__ . '/api/knowledge_tracing.php';
+
+require __DIR__ . '/api/dashboard.php';
