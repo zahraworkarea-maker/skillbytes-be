@@ -75,7 +75,7 @@ class DashboardController extends Controller
         }
 
         // 5. Leaderboard
-        $leaderboard = UserSkillMastery::select('user_id', DB::raw('AVG(mastery_level) as avg_mastery'))
+        $leaderboard = UserSkillMastery::select('user_id', DB::raw('AVG(mastery_probability) as avg_mastery'))
             ->with('user:id,name,email')
             ->groupBy('user_id')
             ->orderByDesc('avg_mastery')
